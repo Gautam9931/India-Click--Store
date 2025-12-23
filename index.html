@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>India Click Store</title>
+
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- FIREBASE COMPAT LIBRARIES -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+<style>
+    :root {
+        --primary: #4e54c8;
+        --primary-grad: linear-gradient(145deg, #4e54c8, #8f94fb);
+        --secondary: #ff6b6b;
+        --dark: #2d3436;
+        --light: #e0e5ec;
+        --sidebar-width: 260px;
+        --header-height: 50px;
+        --chat-header-height: 60px; 
+        --shadow-light: -6px -6px 12px #ffffff;
+        --shadow-dark: 6px 6px 12px #a3b1c6;
+        --chat-bg: #e5ddd5;
+        --success-grad: linear-gradient(145deg, #2ecc71, #27ae60);
+    }
+
+    html, body { width: 100%; overflow-x: hidden; max-width: 100%; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--light); padding-top: var(--header-height); color: var(--dark); position: relative; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--light); }
+    ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+
+    /* UNIFIED HEADER STYLE */
+    #main-header, .unified-header { 
+        position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height); 
+        background: var(--primary-grad); color: white; 
+        display: flex; align-items: center; justify-content: space-between; 
+        padding: 0 15px; z-index: 1000; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    .header-left, .header-right { display: flex; align-items: center; justify-content: center; height: 100%; }
+    .menu-btn { font-size: 18px; cursor: pointer; }
+    .site-title { font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; flex: 1; }
+    .notif-btn { position: relative; font-size: 18px; cursor: pointer; margin-left: 10px; color: white; display: flex; align-items: center; justify-content: center; }
+    .notif-badge { position: absolute; top: -4px; right: -4px; background: var(--secondary); color: white; font-size: 9px; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 1px solid white; display: none; }
+
+    /* DYNAMIC TAB HEADER */
+    #dynamic-header {
+        position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+        background: var(--primary-grad); color: white;
+        display: none; align-items: center; justify-content: flex-start;
+        padding: 0 15px; z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+    }
+    .tab-header-icon {
+        width: 30px; height: 30px; border-radius: 50%; background: white; 
+        display: flex; justify-content: center; align-items: center; 
+        color: var(--primary); font-size: 14px; margin-right: 10px;
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .tab-header-title { font-size: 16px; font-weight: 600; text-transform: capitalize; }
+
+    /* SIDEBAR */
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: none; backdrop-filter: blur(2px); }
+    .sidebar { 
+        position: fixed; top: 0; left: -100%; width: var(--sidebar-width); height: 100%; 
+        background: var(--light); z-index: 1002; transition: 0.3s ease;
+        overflow-y: auto; display: flex; flex-direction: column; 
+        box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        border-top-right-radius: 15px; border-bottom-right-radius: 15px;
+    }
+    .sidebar.active { left: 0; }
+    .sidebar-header { 
+        background: var(--primary-grad); padding: 15px; text-align: center; display: flex; align-items: center; justify-content: center; min-height: 80px; 
+        border-bottom-right-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); margin-bottom: 10px;
+    }
+    .sidebar-logo-img { max-width: 160px; max-height: 50px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); }
+    .sidebar-menu { flex: 1; padding: 10px; }
+    
+    .menu-item { 
+        display: flex; align-items: center; padding: 12px 15px; color: var(--dark); text-decoration: none; font-size: 13px; font-weight: 500;
+        margin-bottom: 8px; cursor: pointer; background: var(--light); border-radius: 10px;
+        box-shadow: 4px 4px 8px #a3b1c6, -4px -4px 8px #ffffff; transition: all 0.2s ease;
+    }
+    .menu-item:active { box-shadow: inset 2px 2px 5px #a3b1c6, inset -2px -2px 5px #ffffff; transform: translateY(1px); }
+    .menu-item i { width: 30px; color: var(--primary); font-size: 16px; }
+    
+    /* SUBMENU STYLE */
+    .submenu { display: none; padding-left: 15px; margin-bottom: 10px; animation: fadeIn 0.3s ease; }
+    .submenu .menu-item { 
+        font-size: 11px; padding: 8px 12px; margin-bottom: 5px; 
+        background: #f0f2f5; box-shadow: 2px 2px 4px #a3b1c6, -2px -2px 4px #ffffff;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .sidebar-footer { padding: 15px; border-top: 1px solid rgba(0,0,0,0.05); text-align: center; }
+    .owner-info { margin-top: 10px; font-size: 11px; color: #666; font-weight: 600; }
+    #sidebar-socials { display: flex; justify-content: center; gap: 8px; margin-bottom: 8px; }
+
+    /* CONTAINER */
+    .container { max-width: 1200px; margin: 0 auto; padding: 10px; display: none; width: 100%; }
+    .container.active-page { display: block; animation: fadeIn 0.4s ease-in-out; }
+
+    /* SEARCH SECTION */
+    .search-section { 
+        background: var(--light); padding: 5px 10px; border-radius: 20px; margin-bottom: 15px; margin-top: 5px;
+        box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff; 
+        display: flex; align-items: center; height: 45px; 
+    }
+    .search-input-container { display: flex; align-items: center; width: 100%; height: 100%; }
+    .search-icon-left { color: var(--primary); padding: 0 8px; font-size: 14px; }
+    .search-bar { flex: 1; padding: 5px; border: none; font-size: 13px; outline: none; background: transparent; color: var(--dark); }
+    .search-icon-right { color: var(--secondary); padding: 0 8px; font-size: 14px; cursor: pointer; border-left: 1px solid rgba(0,0,0,0.1); margin-left: 5px; }
+
+    /* SLIDER */
+    .slider-container { 
+        width: 100%; height: 180px; background: var(--light); border-radius: 15px; overflow: hidden; margin-bottom: 20px; position: relative; 
+        box-shadow: var(--shadow-dark), var(--shadow-light); border: 4px solid var(--light);
+    }
+    .slide { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1s ease-in-out; }
+    .slide.active { display: block; opacity: 1; }
+    .slider-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 10; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; transition: 0.3s; }
+    .dot.active { background: var(--primary); transform: scale(1.2); }
+
+    /* SECTIONS */
+    .section-title { 
+        font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--dark);
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 5px 10px; border-radius: 8px; background: rgba(255,255,255,0.4); margin-top: 15px;
+    }
+    .view-all-link { font-size: 11px; font-weight: 600; color: var(--primary); cursor: pointer; background: white; padding: 4px 10px; border-radius: 15px; box-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+    
+    /* GRID ADJUSTMENT FOR 4 & 8 COLUMNS */
+    .grid-container { 
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 6px; 
+        margin-bottom: 20px; 
+    }
+    @media(min-width: 1024px) { 
+        .grid-container { 
+            grid-template-columns: repeat(8, 1fr); 
+            gap: 12px; 
+        } 
+    }
+
+    .product-card { 
+        background: var(--light); border-radius: 8px; padding: 4px; 
+        cursor: pointer; text-align: center; display:flex; flex-direction: column; justify-content: space-between; height: 100%; 
+        box-shadow: 3px 3px 6px #a3b1c6, -3px -3px 6px #ffffff; transition: transform 0.2s;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    .product-card:active { transform: scale(0.96); }
+    
+    .p-img-box { 
+        width: 100%; aspect-ratio: 1/1;
+        display: flex; align-items: center; justify-content: center; overflow: hidden; 
+        margin-bottom: 4px; border-radius: 6px; background: white; padding: 3px; 
+        box-shadow: inset 2px 2px 4px rgba(0,0,0,0.05); 
+    }
+    .p-img { width: 100%; height: 100%; object-fit: contain; }
+    .p-title { font-size: 9px; font-weight: 600; margin-bottom: 2px; color: #333; height: 24px; line-height: 12px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+    .p-price { color: var(--primary); font-weight: 700; font-size: 10px; margin-bottom: 2px; }
+    .p-meta { font-size: 7px; color: #666; font-weight: 500; margin-bottom: 2px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    
+    .p-btn { 
+        display: block; width: 100%; padding: 4px 0; background: var(--primary-grad); color: white; 
+        text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 9px; text-align: center; 
+        box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+    }
+
+    .btn-copy {
+        background: var(--success-grad); 
+        box-shadow: 2px 2px 6px rgba(46, 204, 113, 0.4);
+    }
+
+    /* CIRCLES */
+    .circle-grid { display: flex; overflow-x: auto; gap: 12px; padding: 5px 2px 15px 2px; margin-bottom: 5px; }
+    .circle-item { min-width: 65px; text-align: center; cursor: pointer; }
+    .circle-img { 
+        width: 55px; height: 55px; border-radius: 50%; object-fit: contain; background: white; margin-bottom: 5px; 
+        box-shadow: 4px 4px 8px #a3b1c6, -4px -4px 8px #ffffff; border: 2px solid white;
+    }
+    .circle-name { font-size: 10px; font-weight: 600; color: #555; }
+
+    /* FOOTER */
+    .footer-new {
+        background: #e0e5ec;
+        padding: 20px 15px 15px; text-align: center; margin-top: 20px; 
+        border-radius: 20px 20px 0 0; 
+        box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+    }
+    .f-logo-bg {
+        width: 50px; height: 50px; background: white; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 10px auto; 
+        box-shadow: 3px 3px 6px #a3b1c6, -3px -3px 6px #ffffff; /* 3D */
+    }
+    .f-logo-img { max-width: 60%; max-height: 60%; object-fit: contain; }
+    
+    .f-desc { font-size: 10px; color: #555; margin-bottom: 8px; font-weight: 500; }
+    .f-social-title { font-weight: 700; color: #333; margin-bottom: 3px; font-size: 12px; }
+    .f-social-sub { font-size: 9px; color: #777; margin-bottom: 10px; }
+    
+    .f-social-icons { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
+    .s-btn {
+        width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        text-decoration: none; color: white; font-size: 14px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2), inset 1px 1px 2px rgba(255,255,255,0.3);
+        border: 1px solid rgba(255,255,255,0.4); transition: transform 0.2s;
+    }
+    .s-btn:active { transform: scale(0.95); }
+    .fb { background: linear-gradient(135deg, #3b5998, #4c70ba); }
+    .wa { background: linear-gradient(135deg, #25D366, #2ecc71); }
+    .tg { background: linear-gradient(135deg, #0088cc, #3498db); }
+    .in { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); }
+    .tw { background: linear-gradient(135deg, #1DA1F2, #4facfe); }
+    .yt { background: linear-gradient(135deg, #FF0000, #ff4d4d); }
+
+    /* FOOTER LINKS (Horizontal) */
+    .f-links { margin-bottom: 15px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+    .f-link-item { 
+        font-size: 10px; color: #555; font-weight: 600; cursor: pointer; text-decoration: none; 
+        padding: 4px 8px; background: rgba(255,255,255,0.5); border-radius: 5px;
+        transition: 0.2s;
+    }
+    .f-link-item:active { background: white; transform: scale(0.95); }
+    
+    .f-copyright { font-size: 9px; color: #ff4757; font-weight: 700; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.05); }
+
+    /* ADMIN & INPUTS */
+    .admin-login-box { background: var(--light); padding: 25px; border-radius: 15px; box-shadow: var(--shadow-dark), var(--shadow-light); max-width: 350px; margin: 40px auto; }
+    
+    .form-input { 
+        width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px; 
+        background: var(--light); 
+        box-shadow: inset 4px 4px 8px #a3b1c6, inset -4px -4px 8px #ffffff; 
+        font-size: 13px; outline: none; color: var(--dark);
+    }
+    
+    .form-btn { 
+        width: 100%; padding: 12px; background: var(--primary-grad); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; 
+        box-shadow: 4px 4px 10px rgba(0,0,0,0.2); 
+        transition: all 0.2s; transform: translateY(0); margin-bottom: 5px;
+    }
+    .form-btn:active { transform: scale(0.98); box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+
+    .btn-sm { padding: 6px 14px; border-radius: 6px; font-size: 11px; border: none; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s; display: inline-block; margin-left: 5px; }
+    .btn-danger { background: #ff4757; box-shadow: 3px 3px 6px rgba(0,0,0,0.2); }
+    .btn-danger:active { transform: scale(0.95); }
+    .btn-edit { background: #f1c40f; color: #333; box-shadow: 3px 3px 6px rgba(0,0,0,0.2); }
+    .btn-edit:active { transform: scale(0.95); }
+
+    /* NOTIFICATION LIST STYLE */
+    .notif-card { 
+        display: flex; align-items: flex-start; background: white; padding: 10px; border-radius: 8px; margin-bottom: 10px; 
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.2s;
+    }
+    .notif-card:active { transform: scale(0.98); }
+    .notif-img { width: 45px; height: 45px; border-radius: 6px; object-fit: cover; margin-right: 10px; }
+    .notif-content h4 { font-size: 13px; margin-bottom: 2px; color: #333; font-weight: 600; }
+    .notif-content p { font-size: 11px; color: #666; line-height: 1.3; }
+    .notif-time { font-size: 10px; color: #999; margin-top: 4px; }
+
+    /* ADMIN CHAT USER LIST STYLE */
+    .user-chat-item {
+        background: white; padding: 12px; border-radius: 10px; margin-bottom: 8px; 
+        display: flex; justify-content: space-between; align-items: center; 
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.1); cursor: pointer; transition: background 0.2s;
+    }
+    .user-chat-item:active { background: #f1f2f6; }
+    .chat-badge { background: #ff4757; color: white; padding: 2px 6px; border-radius: 10px; font-size: 9px; font-weight: bold; margin-right: 5px; }
+
+    .admin-tabs { display: flex; overflow-x: auto; gap: 8px; padding: 5px; margin-bottom: 15px; }
+    .tab-btn { padding: 8px 15px; background: var(--light); border: none; border-radius: 15px; font-size: 12px; font-weight: 600; color: #555; box-shadow: 2px 2px 4px #a3b1c6, -2px -2px 4px #ffffff; flex-shrink: 0; }
+    .tab-btn.active { background: var(--primary); color: white; box-shadow: inset 2px 2px 4px rgba(0,0,0,0.3); }
+    .admin-list-item { background: var(--light); padding: 10px; margin-bottom: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 3px 3px 6px #a3b1c6, -3px -3px 6px #ffffff; font-size: 13px; }
+
+    .admin-section { display: none; }
+    .admin-section.active { display: block; animation: fadeIn 0.3s ease; }
+
+    /* CHAT HEADER */
+    .header-chat-consistent {
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+        padding: 0 15px; 
+        background: var(--primary-grad); color: white;
+        display: flex; align-items: center; justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+        border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;
+        z-index: 1005;
+    }
+
+    /* CHAT CONTAINER */
+    .chat-container { display: flex; flex-direction: column; height: 100vh; background: #e0e5ec; position: relative; }
+    .chat-container::before { content: ""; position: absolute; top:0; left:0; width:100%; height:100%; opacity: 0.05; background-image: radial-gradient(#4e54c8 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+    
+    /* MESSAGES AREA */
+    .chat-messages { 
+        flex: 1; padding: 20px; 
+        padding-bottom: 90px; 
+        padding-top: 80px; 
+        overflow-y: auto; display: flex; flex-direction: column; gap: 15px; 
+        z-index: 2; 
+    }
+    
+    .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 14px; position: relative; line-height: 1.4; box-shadow: 4px 4px 8px rgba(0,0,0,0.15), inset 1px 1px 2px rgba(255,255,255,0.4); border-bottom: 3px solid rgba(0,0,0,0.1); }
+    .msg-sent { align-self: flex-end; background: linear-gradient(145deg, #dcf8c6, #b8e994); color: #2d3436; border-bottom-right-radius: 2px; }
+    .msg-received { align-self: flex-start; background: linear-gradient(145deg, #ffffff, #f1f2f6); color: #2d3436; border-bottom-left-radius: 2px; }
+    .msg-time { font-size: 10px; margin-top: 5px; text-align: right; opacity: 0.7; font-weight: 600; display: flex; align-items: center; justify-content: flex-end; gap: 3px; }
+    
+    /* CHAT INPUT AREA */
+    .chat-input-area { 
+        position: fixed; bottom: 0; left: 0; width: 100%;
+        height: 70px; 
+        padding: 10px; 
+        background: #f0f2f5; 
+        display: flex; align-items: center; 
+        justify-content: space-between; 
+        z-index: 1005;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+        box-sizing: border-box; 
+        gap: 10px; 
+    }
+    
+    .chat-input { 
+        flex: 1; min-width: 0; height: 45px; 
+        padding: 0 15px; font-size: 14px; border-radius: 25px; border: none; outline: none; 
+        background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #333;
+    }
+    
+    .chat-send-btn { 
+        width: 50px; height: 50px; flex-shrink: 0; 
+        border-radius: 50%; border: none; 
+        background: var(--primary); color: white; font-size: 20px; cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        display: flex; align-items: center; justify-content: center;
+    }
+    .chat-send-btn:active { transform: scale(0.9); }
+
+    /* TEXT EDITOR STYLES */
+    .editor-toolbar {
+        display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px;
+        background: #f1f2f6; padding: 5px; border-radius: 8px;
+    }
+    .editor-btn {
+        background: white; border: 1px solid #ccc; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 12px;
+    }
+    .editor-btn:active { background: #e0e0e0; }
+    #editor-content {
+        width: 100%; min-height: 250px; background: white; border-radius: 8px; padding: 15px;
+        box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05); outline: none; margin-bottom: 15px;
+    }
+    
+    /* DYNAMIC PAGE VIEWER */
+    .dynamic-content { background: white; padding: 20px; border-radius: 10px; box-shadow: var(--shadow-dark), var(--shadow-light); min-height: 300px; }
+
+    /* --- APP UPDATE MODAL STYLES --- */
+    .update-modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); z-index: 10000;
+        display: none; justify-content: center; align-items: center;
+        backdrop-filter: blur(4px);
+    }
+    .update-modal-box {
+        background: #f0f2f5; width: 90%; max-width: 400px; padding: 25px;
+        border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        text-align: center; border: 1px solid white;
+        position: relative;
+    }
+    .update-icon {
+        width: 60px; height: 60px; background: white; border-radius: 50%;
+        margin: -50px auto 15px auto; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 24px; color: var(--primary);
+    }
+    .update-title { font-size: 18px; font-weight: 700; color: #333; margin-bottom: 10px; }
+    .update-desc { font-size: 13px; color: #666; margin-bottom: 20px; line-height: 1.5; }
+    .update-btn {
+        width: 100%; padding: 12px; background: var(--primary-grad);
+        color: white; border: none; border-radius: 25px;
+        font-weight: 600; font-size: 14px; cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.2s;
+    }
+    .update-btn:active { transform: scale(0.95); }
+
+</style>
+
+</head>
+<body>
+
+<!-- APP UPDATE MODAL -->
+<div id="app-update-modal" class="update-modal-overlay">
+    <div class="update-modal-box">
+        <div class="update-icon"><i class="fa fa-cloud-download-alt"></i></div>
+        <div class="update-title">New Update Available!</div>
+        <div class="update-desc" id="update-modal-msg">A new version of the app is available with better performance and new features.</div>
+        <button class="update-btn" onclick="performAppUpdate()">Update Now</button>
+    </div>
+</div>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <img src="https://via.placeholder.com/150x50?text=LOGO" id="sidebar-logo-img" class="sidebar-logo-img" alt="Logo">
+    </div>
+    <div class="sidebar-menu" id="sidebar-menu-items">
+        <div id="user-menu">
+            <div class="menu-item" onclick="navigateTo('home'); toggleSidebar()"><i class="fa fa-home"></i> Home</div>
+            <div id="sidebar-custom-tabs"></div>
+            <div class="menu-item" onclick="navigateTo('all-products'); toggleSidebar()"><i class="fa fa-shopping-bag"></i> All Products</div>
+            <div class="menu-item" onclick="navigateTo('all-brands'); toggleSidebar()"><i class="fa fa-tags"></i> All Brands</div>
+            <div class="menu-item" onclick="navigateTo('all-categories'); toggleSidebar()"><i class="fa fa-list"></i> All Categories</div>
+            <div class="menu-item" onclick="navigateTo('filter'); toggleSidebar()"><i class="fa fa-filter"></i> Filter Products</div>
+            <div class="menu-item" onclick="navigateTo('help-chat'); toggleSidebar()"><i class="fa fa-headset"></i> Help / Chat</div>
+            <div class="menu-item" onclick="navigateTo('admin-login'); toggleSidebar()"><i class="fa fa-lock"></i> Admin Login</div>
+            <div class="menu-item" onclick="navigateTo('share'); toggleSidebar()"><i class="fa fa-share-alt"></i> Share App</div>
+            <div class="menu-item" onclick="toggleSubMenu()"><i class="fa fa-info-circle"></i> More Pages <i class="fa fa-caret-down" style="margin-left:auto; font-size:12px;"></i></div>
+            <div id="dynamic-pages-submenu" class="submenu"></div>
+        </div>
+
+        <div id="admin-menu" style="display:none;">
+            <div id="admin-sidebar-links"></div>
+            <div class="menu-item" style="background:#ff4757; color:white;" onclick="adminLogout(); toggleSidebar()"><i class="fa fa-sign-out-alt" style="color:white;"></i> Logout</div>
+        </div>
+    </div>
+    <div class="sidebar-footer">
+        <div class="social-icons" id="sidebar-socials"></div>
+        <div class="owner-info">Owner By -<br>Gautam Kumar</div>
+    </div>
+</div>
+
+<!-- MAIN HEADER -->
+
+<header id="main-header">
+    <div class="header-left"><i class="fa fa-bars menu-btn" onclick="toggleSidebar()"></i></div>
+    <div class="site-title" id="header-site-title">India Click Store</div>
+    <div class="header-right">
+        <div class="notif-btn" onclick="navigateTo('notifications');">
+            <i class="fa fa-bell"></i>
+            <span class="notif-badge" id="notif-badge">0</span>
+        </div>
+    </div>
+</header>
+
+<!-- DYNAMIC TAB HEADER -->
+
+<div id="dynamic-header">
+    <i class="fa fa-arrow-left" onclick="goBack()" style="font-size: 16px; cursor: pointer; padding-right: 15px; color:white;"></i>
+    <div class="tab-header-icon" id="header-icon-container">
+        <i class="fa fa-file" id="dynamic-header-icon"></i>
+    </div>
+    <span class="tab-header-title" id="dynamic-header-title">Tab Name</span>
+</div>
+
+<!-- 1. HOME VIEW -->
+
+<div id="view-home" class="container active-page">
+    <div class="search-section">
+        <div class="search-input-container">
+            <i class="fa fa-search search-icon-left"></i>
+            <input type="text" class="search-bar" placeholder="Search products...">
+            <i class="fa fa-filter search-icon-right" onclick="navigateTo('filter')"></i>
+        </div>
+    </div>
+
+    <div class="slider-container" id="homeSliderContainer">
+        <div id="homeSlider"></div>
+        <div class="slider-dots" id="slider-dots"></div>
+    </div>
+
+    <div class="section-title">Latest Products <span class="view-all-link" onclick="navigateTo('all-products')">View All</span></div>
+    <div id="home-latest-products" class="grid-container"></div>
+
+    <div class="section-title">Top Brands <span class="view-all-link" onclick="navigateTo('all-brands')">View All</span></div>
+    <div class="circle-grid" id="homeBrands"></div>
+
+    <div class="section-title">All Products <span class="view-all-link" onclick="navigateTo('all-products')">View All</span></div>
+    <div id="home-all-products" class="grid-container"></div>
+
+    <div class="section-title">Categories <span class="view-all-link" onclick="navigateTo('all-categories')">View All</span></div>
+    <div class="circle-grid" id="homeCategories"></div>
+
+    <div id="home-custom-tabs-area"></div>
+
+    <div class="footer-new">
+        <div class="f-logo-bg"><img src="https://via.placeholder.com/150x50?text=LOGO" id="f-logo-img" class="f-logo-img" alt="Store Logo"></div>
+        <p class="f-desc">India Click Store: Your trusted platform for the best deals.</p>
+        <div class="f-social-title">Follow Us On Social Media</div>
+        <div class="f-social-sub">Get Latest Update On Social Media</div>
+        <div class="f-social-icons">
+            <a id="f-fb" href="#" target="_blank" class="s-btn fb"><i class="fab fa-facebook-f"></i></a>
+            <a id="f-wa" href="#" target="_blank" class="s-btn wa"><i class="fab fa-whatsapp"></i></a>
+            <a id="f-tg" href="#" target="_blank" class="s-btn tg"><i class="fab fa-telegram-plane"></i></a>
+            <a id="f-in" href="#" target="_blank" class="s-btn in"><i class="fab fa-instagram"></i></a>
+            <a id="f-tw" href="#" target="_blank" class="s-btn tw"><i class="fab fa-twitter"></i></a>
+            <a id="f-yt" href="#" target="_blank" class="s-btn yt"><i class="fab fa-youtube"></i></a>
+        </div>
+        <div class="f-links" id="home-footer-links"></div>
+        <div class="f-copyright" id="footer-copyright-text">© 2025 India Click Store All rights reserved</div>
+    </div>
+</div>
+
+<!-- 2. GENERIC LIST VIEW -->
+
+<div id="view-list" class="container">
+    <div id="list-container" class="grid-container" style="margin-top: 15px;"></div>
+</div>
+
+<!-- 3. ALL PRODUCTS VIEW -->
+
+<div id="view-products" class="container">
+    <div id="products-container" class="grid-container" style="margin-top: 15px;"></div>
+</div>
+
+<!-- CUSTOM TAB VIEW -->
+
+<div id="view-custom-tab" class="container">
+    <div id="custom-tab-products" class="grid-container" style="margin-top: 15px;"></div>
+</div>
+
+<!-- SHARE APP PAGE -->
+<div id="view-share" class="container">
+    <div style="background:var(--light); padding:20px; border-radius:15px; text-align:center; box-shadow: var(--shadow-dark), var(--shadow-light); margin-top: 20px;">
+        <div style="padding: 10px; background: white; display: inline-block; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px;">
+            <img src="https://via.placeholder.com/200x200?text=Share+App" id="share-app-img" style="max-width: 160px; height: auto; display: block; border-radius: 5px;">
+        </div>
+        <p style="font-weight: 600; color: #333; margin-bottom: 5px;">Share with Friends!</p>
+        <p style="font-size: 11px; color: #666; margin-bottom: 20px;">Share the app or website with your friends.</p>
+        
+        <button class="p-btn" style="background: var(--success-grad); font-size: 12px; height: 40px; margin-bottom: 12px;" onclick="shareAndCopy('app')">
+            <i class="fa fa-mobile-alt"></i> Share App & Copy Link
+        </button>
+
+        <button class="p-btn" style="background: #4facfe; font-size: 12px; height: 40px;" onclick="shareAndCopy('website')">
+            <i class="fa fa-globe"></i> Share Website & Copy Link
+        </button>
+    </div>
+</div>
+
+
+<!-- FILTER PAGE -->
+
+<div id="view-filter" class="container">
+    <div style="background: var(--light); padding: 20px; border-radius: 15px; box-shadow: var(--shadow-dark), var(--shadow-light); margin-top: 20px;">
+        <h3 style="margin-bottom:15px;">Filter Products</h3>
+        <label class="filter-label" style="font-size:12px; font-weight:600;">Category</label>
+        <select id="filter-category" class="form-input"><option value="">All Categories</option></select>
+        <label class="filter-label" style="font-size:12px; font-weight:600;">Brand</label>
+        <select id="filter-brand" class="form-input"><option value="">All Brands</option></select>
+        <label class="filter-label" style="font-size:12px; font-weight:600;">Price Range (₹)</label>
+        <div style="display:flex; gap:10px;">
+            <input type="number" id="filter-min" class="form-input" placeholder="Min Price">
+            <input type="number" id="filter-max" class="form-input" placeholder="Max Price">
+        </div>
+        <button onclick="applyFilters()" class="p-btn" style="margin-top:10px;">Apply Filter</button>
+        <button onclick="clearFilters()" class="p-btn" style="margin-top:10px; background:#95a5a6;">Clear Filter</button>
+    </div>
+</div>
+
+<!-- DYNAMIC PAGE VIEWER -->
+
+<div id="view-dynamic-page" class="container">
+    <div id="dynamic-page-content" class="dynamic-content"></div>
+</div>
+
+<!-- NOTIFICATIONS -->
+
+<div id="view-notifications" class="container">
+    <button id="enable-notif-btn" class="enable-notif-btn" onclick="requestNotifyPermission()" style="margin-top: 20px; font-size:12px; padding:10px;">🔔 Enable Push Notifications</button>
+    <div id="notification-list-container">
+        <p style="text-align:center; color:#777; margin-top:20px;">Loading notifications...</p>
+    </div>
+</div>
+
+<!-- USER HELP / CHAT VIEW -->
+
+<div id="view-help-chat" class="container" style="display: none; height: 100vh; padding: 0;">
+    <div id="help-header" class="header-chat-consistent">
+        <div style="display: flex; align-items: center;">
+            <i class="fa fa-arrow-left" onclick="goBack()" style="font-size: 16px; cursor: pointer; padding-right: 15px;"></i>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="width: 35px; height: 35px; border-radius: 50%; background: white; display: flex; justify-content: center; align-items: center; color: var(--primary);"><i class="fa fa-headset" style="font-size:18px;"></i></div>
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600; font-size:16px; line-height: 1.1;">Customer Care</span>
+                    <span id="chat-online-status" style="font-size: 10px; font-weight: 400; opacity: 0.9;">OFFLINE</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chat-container">
+        <div id="user-chat-box" class="chat-messages"></div>
+        <div class="chat-input-area">
+            <input type="text" id="user-chat-input" class="chat-input" placeholder="Type a message...">
+            <button class="chat-send-btn" onclick="sendUserMessage()"><i class="fa fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+
+<div id="view-admin-login" class="container" style="padding:0;">
+    <div class="unified-header">
+        <div class="header-left">
+             <i class="fa fa-arrow-left menu-btn" onclick="goBack()" style="margin-right: 15px;"></i>
+             <div class="tab-header-icon"><i class="fa fa-lock"></i></div>
+             <span class="tab-header-title" style="margin-left: 0px;">Admin Login</span>
+        </div>
+    </div>
+    <div class="admin-login-box" style="margin-top: 80px;">
+        <h2 style="text-align:center; margin-bottom:20px; color: var(--primary); font-size:18px;">Login</h2>
+        <input type="email" id="adminEmail" class="form-input" placeholder="Email">
+        <input type="password" id="adminPass" class="form-input" placeholder="Password">
+        <button onclick="adminLogin()" class="form-btn">Login</button>
+    </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+
+<div id="view-admin-dashboard" class="container">
+    <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchAdminTab('tab-slider')">Slider</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-custom-pages')">Custom Tabs</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-custom-products')">Tab Products</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-products')">Products</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-categories')">Categories</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-brands')">Brands</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-notifications')">Notifications</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-messages')">Messages (Chat)</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-page-builder')">Page Builder</button>
+        <button class="tab-btn" onclick="switchAdminTab('tab-settings')">Settings</button>
+    </div>
+
+    <!-- ADMIN SECTIONS -->
+    <div id="tab-slider" class="admin-section active">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <h3>Add Slider (3 Views)</h3>
+            <label style="font-size:11px;">1. Mobile View URL</label>
+            <input type="text" id="as-img-mob" class="form-input" placeholder="Mobile Image URL">
+            <label style="font-size:11px;">2. Mobile Browser Desktop Mode URL</label>
+            <input type="text" id="as-img-tab" class="form-input" placeholder="Tablet/Desktop Mode URL">
+            <label style="font-size:11px;">3. PC/Laptop View URL</label>
+            <input type="text" id="as-img-pc" class="form-input" placeholder="PC View Image URL">
+            <button onclick="saveSlide()" class="form-btn">Add Slide</button>
+        </div>
+        <div id="admin-slider-list"></div>
+    </div>
+
+    <div id="tab-custom-pages" class="admin-section">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <h3>Create Sidebar Tab/Page</h3>
+            <input type="hidden" id="act-id">
+            <input type="text" id="act-name" class="form-input" placeholder="Tab Name">
+            <input type="text" id="act-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-star)">
+            <label style="font-size:12px; display:block; margin-bottom:10px;">
+                <input type="checkbox" id="act-home"> Show on Home Page
+            </label>
+            <button onclick="saveCustomTab()" id="btn-save-tab" class="form-btn" style="width:48%; display:inline-block;">Create Tab</button>
+            <button onclick="updateCustomTab()" id="btn-update-tab" class="form-btn btn-edit" style="width:48%; display:none;">Update Tab</button>
+            <button onclick="resetTabForm()" id="btn-cancel-tab" class="form-btn" style="width:48%; background:#666; display:none; box-shadow:none;">Cancel</button>
+        </div>
+        <div id="admin-custom-tabs-list"></div>
+    </div>
+
+    <div id="tab-custom-products" class="admin-section">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <h3>Add Product to Custom Tab</h3>
+            <select id="acp-tab-select" class="form-input"><option value="">Select Tab</option></select>
+            <input type="text" id="acp-name" class="form-input" placeholder="Product Name">
+            <input type="text" id="acp-img" class="form-input" placeholder="Image URL">
+            <input type="text" id="acp-btn-text" class="form-input" placeholder="Button Name">
+            <input type="text" id="acp-link" class="form-input" placeholder="Link">
+            <button onclick="saveCustomProduct()" class="form-btn">Add Product</button>
+        </div>
+        <div id="admin-custom-products-list"></div>
+    </div>
+
+    <div id="tab-products" class="admin-section">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <h3>Add Main Product</h3>
+            <input type="text" id="ap-name" class="form-input" placeholder="Product Name">
+            <input type="text" id="ap-price" class="form-input" placeholder="Price" value="₹ ">
+            <input type="text" id="ap-img" class="form-input" placeholder="Image URL">
+            <select id="ap-cat" class="form-input"><option value="">Select Category</option></select>
+            <select id="ap-brand" class="form-input"><option value="">Select Brand</option></select>
+            <input type="text" id="ap-link" class="form-input" placeholder="Affiliate Link">
+            <button onclick="saveProduct()" class="form-btn">Add Product</button>
+        </div>
+        <div id="admin-product-list"></div>
+    </div>
+
+    <div id="tab-categories" class="admin-section">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <input type="text" id="ac-name" class="form-input" placeholder="Category Name">
+            <input type="text" id="ac-img" class="form-input" placeholder="Image URL (Icon)">
+            <button onclick="saveCategory()" class="form-btn">Add Category</button>
+        </div>
+        <div id="admin-category-list"></div>
+    </div>
+
+    <div id="tab-brands" class="admin-section">
+        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <input type="text" id="ab-name" class="form-input" placeholder="Brand Name">
+            <input type="text" id="ab-img" class="form-input" placeholder="Image URL">
+            <button onclick="saveBrand()" class="form-btn">Add Brand</button>
+        </div>
+        <div id="admin-brand-list"></div>
+    </div>
+
+    <div id="tab-notifications" class="admin-section">
+        <div id="admin-notification-list"></div>
+    </div>
+
+    <div id="tab-messages" class="admin-section">
+        <div id="admin-chat-list-view">
+            <h3>User Chats</h3>
+            <div id="admin-users-list"></div>
+        </div>
+        
+        <div id="admin-single-chat-view" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:var(--chat-bg); flex-direction:column;">
+            <div class="header-chat-consistent">
+                <i class="fa fa-arrow-left" onclick="closeAdminChat()" style="font-size:16px; cursor:pointer; margin-right:15px;"></i>
+                <div style="flex:1; display:flex; align-items:center; overflow:hidden;">
+                    <div style="width:35px; height:35px; border-radius:50%; background:white; display:flex; justify-content:center; align-items:center; color:var(--primary); margin-right:10px; flex-shrink:0;">
+                        <i class="fa fa-user" style="font-size:18px;"></i>
+                    </div>
+                    <div style="display:flex; flex-direction:column; overflow:hidden;">
+                        <span id="chat-user-name" style="font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">User Name</span>
+                        <span style="font-size:10px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Chat ID...</span>
+                    </div>
+                </div>
+                <div onclick="deleteCurrentChat()" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+                    <i class="fa fa-trash" style="font-size:16px;"></i>
+                </div>
+            </div>
+
+            <div class="chat-container">
+                 <div id="admin-messages-area" class="chat-messages"></div>
+                 <div class="chat-input-area">
+                    <input type="text" id="admin-chat-input" class="chat-input" placeholder="Type a message...">
+                    <button class="chat-send-btn" onclick="sendAdminReply()"><i class="fa fa-paper-plane"></i></button>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-page-builder" class="admin-section">
+        <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light); margin-bottom: 20px;">
+            <h3>Create/Edit Page</h3>
+            <input type="text" id="dp-title" class="form-input" placeholder="Page Title (e.g. Terms, Privacy)">
+            <input type="text" id="dp-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-info, fa fa-gavel)">
+            
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="execCmd('bold')">Bold</button>
+                <button class="editor-btn" onclick="execCmd('underline')">Underline</button>
+                <select onchange="execCmd('fontSize', this.value)" style="padding:4px;">
+                    <option value="3">Size Normal</option>
+                    <option value="1">Size Small</option>
+                    <option value="5">Size Large</option>
+                    <option value="7">Size Huge</option>
+                </select>
+                <input type="color" onchange="execCmd('foreColor', this.value)" title="Text Color">
+            </div>
+            
+            <div id="editor-content" contenteditable="true">Type your page content here...</div>
+            <button onclick="saveDynamicPage()" class="form-btn">Save Page</button>
+        </div>
+        <div id="admin-dynamic-pages-list"></div>
+    </div>
+
+    <div id="tab-settings" class="admin-section">
+        <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+            <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px;">App Version Control</h3>
+            <label style="font-size:11px; font-weight:bold;">Current App Version (Decimal, e.g. 1.0)</label>
+            <input type="number" step="0.1" id="set-version" class="form-input" placeholder="e.g. 1.0">
+            <label style="font-size:11px; font-weight:bold;">Update Message</label>
+            <input type="text" id="set-update-msg" class="form-input" placeholder="New features added...">
+            
+            <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px; margin-top:20px;">General Settings</h3>
+            <h3>Website Name</h3>
+            <input type="text" id="set-name" class="form-input" placeholder="Website Name">
+            <h3>Website Logo</h3>
+            <input type="text" id="set-logo" class="form-input" placeholder="Logo Image URL">
+            <h3>Share App Image</h3>
+            <input type="text" id="set-share-img" class="form-input" placeholder="Share App Image/QR URL">
+            
+            <h3>Share App Link</h3>
+            <input type="text" id="set-share-app-link" class="form-input" placeholder="URL for sharing the app">
+            <h3>Share Website Link</h3>
+            <input type="text" id="set-share-website-link" class="form-input" placeholder="URL for sharing the website">
+
+            <h3>Footer Copyright Text</h3>
+            <input type="text" id="set-copyright" class="form-input" placeholder="© 2025 ...">
+            <h3>Social Media</h3>
+            <input type="text" id="set-fb" class="form-input" placeholder="Facebook URL">
+            <input type="text" id="set-insta" class="form-input" placeholder="Instagram URL">
+            <input type="text" id="set-tw" class="form-input" placeholder="Twitter URL">
+            <input type="text" id="set-wa" class="form-input" placeholder="WhatsApp Number">
+            <input type="text" id="set-tg" class="form-input" placeholder="Telegram URL">
+            <input type="text" id="set-yt" class="form-input" placeholder="YouTube URL"> 
+            <button onclick="saveSettings()" class="form-btn">Save Settings</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAmQEQoC5S7wAFhdGfoysY2VXMMJ5k7Vs4",
+        authDomain: "india-click-store.firebaseapp.com",
+        databaseURL: "https://india-click-store-default-rtdb.firebaseio.com",
+        projectId: "india-click-store",
+        storageBucket: "india-click-store.firebasestorage.app",
+        messagingSenderId: "397965922156",
+        appId: "1:397965922156:web:1d6c7f2d73559c61ae6d49"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.database();
+    let messaging;
+    try { messaging = firebase.messaging(); } catch (e) { console.log(e); }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./firebase-messaging-sw.js')
+        .then((registration) => { if(messaging) messaging.useServiceWorker(registration); }).catch(err => console.log(err));
+    }
+
+    let categories = [], brands = [], products = [], slides = [], notifications = [], settings = {}, customTabs = [], customProducts = [], dynamicPages = [];
+    
+    let chatUserId = localStorage.getItem('chatUserId');
+    if (!chatUserId) {
+        chatUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('chatUserId', chatUserId);
+    }
+    
+    // --- APP UPDATE LOGIC START ---
+    let localAppVersion = localStorage.getItem('local_app_version');
+    if(!localAppVersion) {
+        localAppVersion = "1.0"; // Default starting version
+        localStorage.setItem('local_app_version', localAppVersion);
+    }
+
+    function checkForAppUpdates() {
+        if(settings && settings.appVersion) {
+            const serverVer = parseFloat(settings.appVersion);
+            const localVer = parseFloat(localAppVersion);
+
+            if(serverVer > localVer) {
+                // Show Update Modal
+                const modal = document.getElementById('app-update-modal');
+                const msg = document.getElementById('update-modal-msg');
+                if(settings.updateMsg) msg.innerText = settings.updateMsg;
+                modal.style.display = 'flex';
+            }
+        }
+    }
+
+    window.performAppUpdate = () => {
+        // Save new version
+        localStorage.setItem('local_app_version', settings.appVersion);
+        // Reload page to fetch new code/content
+        window.location.reload(true);
+    };
+    // --- APP UPDATE LOGIC END ---
+
+    window.shareAndCopy = (type) => {
+        let linkToShare;
+        let shareTitle = "Check this out!";
+        
+        if (type === 'app') {
+            linkToShare = settings.shareAppLink || window.location.href;
+            shareTitle = `Check out the ${settings.name || 'India Click Store'} App!`;
+        } else { // 'website'
+            linkToShare = settings.shareWebsiteLink || window.location.href;
+            shareTitle = `Visit the ${settings.name || 'India Click Store'} Website!`;
+        }
+
+        if (!linkToShare) {
+            alert('Share link is not configured in the admin panel.');
+            return;
+        }
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(linkToShare).then(() => {
+                alert('Link Copied! Now opening share options...');
+                if (navigator.share) {
+                    navigator.share({ 
+                        title: shareTitle, 
+                        text: 'I found some amazing deals here!', 
+                        url: linkToShare 
+                    }).catch(err => console.log('Share failed:', err));
+                } else {
+                    alert('Web Share is not supported on this device, but the link has been copied to your clipboard.');
+                }
+            }).catch(err => {
+                fallbackCopy(linkToShare, true, shareTitle);
+            });
+        } else {
+            fallbackCopy(linkToShare, true, shareTitle);
+        }
+    };
+    
+    function fallbackCopy(text, thenShare = false, shareTitle = 'Check this out!') {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('Link Copied! Now opening share options...');
+            if (thenShare && navigator.share) {
+                navigator.share({ title: shareTitle, text: 'I found some amazing deals here!', url: text }).catch(err => console.log('Share failed:', err));
+            } else if (thenShare) {
+                alert('Web Share is not supported on this device, but the link has been copied to your clipboard.');
+            }
+        } catch (err) {
+            prompt("Could not copy automatically. Please copy this link:", text);
+        }
+        document.body.removeChild(textArea);
+    }
+
+
+    window.requestNotifyPermission = () => { if ("Notification" in window) Notification.requestPermission().then(p => { if (p === "granted") alert("Notifications Enabled!"); }); };
+
+    window.toggleSidebar = () => {
+        document.getElementById('sidebar').classList.toggle('active');
+        const overlay = document.querySelector('.sidebar-overlay');
+        overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+    };
+
+    window.toggleSubMenu = () => {
+        const el = document.getElementById('dynamic-pages-submenu');
+        if (el.style.display === 'block') { el.style.display = 'none'; } else { el.style.display = 'block'; }
+    };
+
+    window.goBack = () => { navigateTo('home'); };
+
+    window.navigateTo = (viewId) => {
+        if(document.getElementById('view-admin-dashboard').classList.contains('active-page') && viewId !== 'admin-dashboard') { adminLogout(); }
+        if(viewId !== 'admin-dashboard' && viewId !== 'admin-login') { if(auth.currentUser) { auth.signOut(); updateSidebarForUser(); } }
+        document.querySelectorAll('.container').forEach(el => el.classList.remove('active-page'));
+        document.getElementById('view-help-chat').style.display = 'none';
+
+        const mainHeader = document.getElementById('main-header');
+        const dynHeader = document.getElementById('dynamic-header');
+        const siteTitleEl = document.getElementById('header-site-title');
+
+        if(viewId === 'home') {
+            document.getElementById('view-home').classList.add('active-page');
+            mainHeader.style.display = 'flex';
+            dynHeader.style.display = 'none';
+            document.querySelector('.notif-btn').style.display = 'flex'; 
+            siteTitleEl.innerText = settings.name || "India Click Store";
+            renderHomeLatestProducts(); renderHomeAllProducts();
+        } else if(viewId === 'help-chat') {
+            document.getElementById('view-help-chat').style.display = 'block';
+            mainHeader.style.display = 'none';
+            dynHeader.style.display = 'none';
+            loadUserChat();
+        } else if(viewId === 'admin-login') {
+            document.getElementById('view-admin-login').classList.add('active-page');
+            mainHeader.style.display = 'none'; 
+            dynHeader.style.display = 'none';
+            document.querySelector('.notif-btn').style.display = 'none';
+        } else if(viewId === 'admin-dashboard') {
+            document.getElementById('view-admin-dashboard').classList.add('active-page');
+            mainHeader.style.display = 'flex'; 
+            dynHeader.style.display = 'none';
+            siteTitleEl.innerText = "Admin Panel";
+        } else {
+            mainHeader.style.display = 'none';
+            dynHeader.style.display = 'flex';
+            updateDynamicHeader(viewId);
+            if(viewId === 'view-custom-tab') {
+                document.getElementById('view-custom-tab').classList.add('active-page');
+            } else if(viewId === 'all-categories') {
+                renderList('categories'); document.getElementById('view-list').classList.add('active-page');
+            } else if(viewId === 'all-brands') {
+                renderList('brands'); document.getElementById('view-list').classList.add('active-page');
+            } else if(viewId === 'all-products') {
+                renderPublicProducts(products); 
+                document.getElementById('view-products').classList.add('active-page');
+            } else if(viewId === 'notifications') {
+                document.getElementById('view-notifications').classList.add('active-page');
+                document.getElementById('notif-badge').style.display = 'none';
+                if (!("Notification" in window)) document.getElementById('enable-notif-btn').style.display = 'none';
+            } else if(viewId === 'share') {
+                document.getElementById('view-share').classList.add('active-page');
+            } else if(viewId === 'filter') {
+                document.getElementById('view-filter').classList.add('active-page'); populateFilterSelects();
+            } else if(viewId === 'view-dynamic-page') {
+                document.getElementById('view-dynamic-page').classList.add('active-page');
+            }
+        }
+    };
+
+    function updateDynamicHeader(viewId) {
+        const titleEl = document.getElementById('dynamic-header-title');
+        const iconEl = document.getElementById('dynamic-header-icon');
+        const iconContainer = document.getElementById('header-icon-container');
+        let title = "Page"; let iconClass = "fa fa-file";
+        let showIcon = true;
+        if(viewId === 'all-products') { title = "All Products"; iconClass = "fa fa-shopping-bag"; }
+        else if(viewId === 'all-brands') { title = "All Brands"; iconClass = "fa fa-tags"; }
+        else if(viewId === 'all-categories') { title = "All Categories"; iconClass = "fa fa-list"; }
+        else if(viewId === 'filter') { title = "Filter Products"; iconClass = "fa fa-filter"; }
+        else if(viewId === 'notifications') { title = "Notifications"; iconClass = "fa fa-bell"; }
+        else if(viewId === 'share') { title = "Share App"; iconClass = "fa fa-share-alt"; }
+        titleEl.innerText = title; 
+        if(showIcon) { iconContainer.style.display = 'flex'; iconEl.className = iconClass; } else { iconContainer.style.display = 'none'; }
+    }
+
+    window.execCmd = (cmd, value = null) => { document.execCommand(cmd, false, value); };
+
+    window.saveDynamicPage = () => {
+        const title = document.getElementById('dp-title').value;
+        const icon = document.getElementById('dp-icon').value || 'fa fa-file';
+        const content = document.getElementById('editor-content').innerHTML;
+        if(title && content) {
+            db.ref('dynamic_pages').push({ title, icon, content }).then(() => {
+                alert('Page Saved!');
+                document.getElementById('dp-title').value = '';
+                document.getElementById('dp-icon').value = '';
+                document.getElementById('editor-content').innerHTML = 'Type your page content here...';
+            });
+        }
+    };
+
+    window.openDynamicPage = (id) => {
+        const page = dynamicPages.find(p => p.id === id);
+        if(page) {
+            navigateTo('view-dynamic-page');
+            document.getElementById('dynamic-header-title').innerText = page.title;
+            document.getElementById('dynamic-header-icon').className = page.icon || 'fa fa-file';
+            document.getElementById('dynamic-page-content').innerHTML = page.content;
+        }
+    };
+
+    function renderDynamicPagesLists() {
+        const sidebarHtml = dynamicPages.map(p => `<div class="menu-item" onclick="openDynamicPage('${p.id}'); toggleSidebar();"><i class="${p.icon || 'fa fa-file'}"></i> ${p.title}</div>`).join('');
+        document.getElementById('dynamic-pages-submenu').innerHTML = sidebarHtml;
+        const footerHtml = dynamicPages.map(p => `<a class="f-link-item" onclick="openDynamicPage('${p.id}')">${p.title}</a>`).join('');
+        document.getElementById('home-footer-links').innerHTML = footerHtml;
+        const adminHtml = dynamicPages.map(p => `<div class="admin-list-item"><span><i class="${p.icon || 'fa fa-file'}"></i> ${p.title}</span><button class="btn-sm btn-danger" onclick="deleteItem('dynamic_pages/${p.id}')">Del</button></div>`).join('');
+        document.getElementById('admin-dynamic-pages-list').innerHTML = adminHtml;
+    }
+
+    window.openCategoryPage = (catName) => { navigateTo('all-products'); document.getElementById('dynamic-header-title').innerText = catName; const filtered = products.filter(p => p.category === catName); renderPublicProducts(filtered); };
+    window.openBrandPage = (brandName) => { navigateTo('all-products'); document.getElementById('dynamic-header-title').innerText = brandName; const filtered = products.filter(p => p.brand === brandName); renderPublicProducts(filtered); };
+
+    window.openCustomTab = (tabId, tabName) => {
+        navigateTo('view-custom-tab');
+        const tab = customTabs.find(t => t.id === tabId);
+        if(tab) {
+            document.getElementById('header-icon-container').style.display = 'flex';
+            document.getElementById('dynamic-header-icon').className = tab.icon || 'fa fa-star';
+            document.getElementById('dynamic-header-title').innerText = tab.name;
+        }
+        const cp = customProducts.filter(p => p.tabId === tabId);
+        const div = document.getElementById('custom-tab-products');
+        div.innerHTML = cp.length === 0 ? "<p>No products in this tab.</p>" : cp.map(p => getProductCardHTML(p)).join('');
+    };
+
+    function populateFilterSelects() {
+        document.getElementById('filter-category').innerHTML = '<option value="">All Categories</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        document.getElementById('filter-brand').innerHTML = '<option value="">All Brands</option>' + brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+    }
+
+    window.applyFilters = () => {
+        const cat = document.getElementById('filter-category').value;
+        const brand = document.getElementById('filter-brand').value;
+        const min = parseInt(document.getElementById('filter-min').value) || 0;
+        const max = parseInt(document.getElementById('filter-max').value) || 99999999;
+        const filtered = products.filter(p => {
+            let pPrice = parseInt(p.price.toString().replace(/[^0-9]/g, '')) || 0;
+            return (cat === "" || p.category === cat) && (brand === "" || p.brand === brand) && (pPrice >= min && pPrice <= max);
+        });
+        renderPublicProducts(filtered);
+        navigateTo('view-products'); 
+        document.getElementById('dynamic-header-title').innerText = "Filtered Results";
+    };
+
+    window.clearFilters = () => { document.getElementById('filter-category').value = ""; document.getElementById('filter-brand').value = ""; navigateTo('all-products'); };
+
+    /* HELP CHAT LOGIC UPDATED FOR TICKS */
+    let adminOnlineStatus = false;
+
+    function loadUserChat() {
+        const box = document.getElementById('user-chat-box');
+        
+        db.ref('status/admin').on('value', (s) => {
+            const st = s.val();
+            const statusEl = document.getElementById('chat-online-status');
+            if(st && st.online) { 
+                adminOnlineStatus = true;
+                statusEl.innerText = "ONLINE"; 
+                statusEl.style.color = "#dcf8c6"; 
+            } 
+            else if (st && st.lastSeen) {
+                adminOnlineStatus = false;
+                const lastSeenDate = new Date(st.lastSeen);
+                const formattedDate = lastSeenDate.toLocaleDateString([], { day: '2-digit', month: 'short' });
+                const formattedTime = lastSeenDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                statusEl.innerText = `Last Seen: ${formattedDate}, ${formattedTime}`;
+                statusEl.style.color = "rgba(255,255,255,0.8)";
+            }
+            else { 
+                adminOnlineStatus = false;
+                statusEl.innerText = "OFFLINE"; 
+                statusEl.style.color = "rgba(255,255,255,0.8)"; 
+            }
+        });
+
+        db.ref(`chats/${chatUserId}`).on('value', (s) => {
+            box.innerHTML = '';
+            s.forEach(child => {
+                const msg = child.val();
+                const time = new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                if(msg.sender === 'user') {
+                    let tickIcon = '<i class="fa fa-check"></i>'; 
+                    if(msg.read) {
+                        tickIcon = '<i class="fa fa-check-double" style="color:#3498db"></i>'; 
+                    } else if(msg.delivered) {
+                        tickIcon = '<i class="fa fa-check-double"></i>'; 
+                    }
+                    
+                    if(adminOnlineStatus && !msg.delivered && !msg.read) {
+                        db.ref(`chats/${chatUserId}/${child.key}`).update({ delivered: true });
+                    }
+
+                    box.innerHTML += `<div class="msg-bubble msg-sent">${msg.text}<div class="msg-time">${time} ${tickIcon}</div></div>`;
+                } else {
+                    box.innerHTML += `<div class="msg-bubble msg-received">${msg.text}<div class="msg-time">${time}</div></div>`;
+                }
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    window.sendUserMessage = () => {
+        const inp = document.getElementById('user-chat-input');
+        const text = inp.value;
+        if(text.trim()) {
+            db.ref(`chats/${chatUserId}`).push({ 
+                text: text, 
+                sender: 'user', 
+                timestamp: Date.now(), 
+                read: false, 
+                delivered: adminOnlineStatus 
+            });
+            db.ref(`chat_users/${chatUserId}`).set({ 
+                lastMessage: text, 
+                lastTime: Date.now(), 
+                unread: true 
+            });
+            inp.value = '';
+        }
+    };
+
+    function loadAdminChatList() {
+        db.ref('chat_users').on('value', (s) => {
+            const list = document.getElementById('admin-users-list');
+            list.innerHTML = '';
+            s.forEach(u => {
+                const uid = u.key; const data = u.val();
+                list.innerHTML += `<div class="user-chat-item" onclick="openAdminChat('${uid}')"><div><strong>User ID: ${uid.substr(0,8)}...</strong><br><span style="font-size:12px; color:#666;">${data.lastMessage}</span></div><div>${data.unread ? '<span class="chat-badge">New</span>' : ''}<span style="font-size:10px;">${new Date(data.lastTime).toLocaleDateString()}</span></div></div>`;
+            });
+        });
+    }
+    
+    let currentAdminChatId = null;
+    window.openAdminChat = (uid) => {
+        currentAdminChatId = uid;
+        document.getElementById('admin-chat-list-view').style.display = 'none';
+        document.getElementById('admin-single-chat-view').style.display = 'flex'; 
+        document.getElementById('chat-user-name').innerText = "Chat: " + uid.substr(0,8);
+        db.ref(`chat_users/${uid}`).update({ unread: false });
+        const box = document.getElementById('admin-messages-area');
+        db.ref(`chats/${uid}`).on('value', (s) => {
+            box.innerHTML = '';
+            if(s.val()) {
+                s.forEach(child => {
+                    const msg = child.val(); const key = child.key;
+                    if(msg.sender === 'admin') { 
+                        box.innerHTML += `<div class="msg-bubble msg-sent">${msg.text}<div class="msg-time">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div>`; 
+                    } 
+                    else { 
+                        box.innerHTML += `<div class="msg-bubble msg-received">${msg.text}<div class="msg-time">${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div></div>`; 
+                        if(!msg.read) db.ref(`chats/${uid}/${key}`).update({read: true, delivered: true}); 
+                    }
+                });
+            }
+            box.scrollTop = box.scrollHeight;
+        });
+    };
+
+    window.closeAdminChat = () => { currentAdminChatId = null; document.getElementById('admin-single-chat-view').style.display = 'none'; document.getElementById('admin-chat-list-view').style.display = 'block'; };
+
+    window.sendAdminReply = () => {
+        const inp = document.getElementById('admin-chat-input'); const text = inp.value;
+        if(text.trim() && currentAdminChatId) {
+            db.ref(`chats/${currentAdminChatId}`).push({ text: text, sender: 'admin', timestamp: Date.now(), read: false });
+            db.ref(`chat_users/${currentAdminChatId}`).update({ lastMessage: "Reply: " + text, lastTime: Date.now() });
+            inp.value = '';
+        }
+    };
+
+    window.deleteCurrentChat = () => { if(confirm("Delete conversation?")) { db.ref(`chats/${currentAdminChatId}`).remove(); db.ref(`chat_users/${currentAdminChatId}`).remove(); closeAdminChat(); } };
+
+    // Real-time Database Listeners
+    db.ref('categories').on('value', (s) => { categories=[]; s.forEach(c=>{categories.push({id:c.key,...c.val()})}); renderHomeCategories(); updateAdminCategoryList(); populateFilterSelects(); populateAdminSelects(); });
+    db.ref('brands').on('value', (s) => { brands=[]; s.forEach(c=>{brands.push({id:c.key,...c.val()})}); renderHomeBrands(); updateAdminBrandList(); populateFilterSelects(); populateAdminSelects(); });
+    db.ref('products').on('value', (s) => { products=[]; s.forEach(c=>{products.push({id:c.key,...c.val()})}); updateAdminProductList(); renderHomeLatestProducts(); renderHomeAllProducts(); renderPublicProducts(products); });
+    db.ref('slider').on('value', (s) => { slides=[]; s.forEach(c=>{slides.push({id:c.key,...c.val()})}); renderSlider(); updateAdminSliderList(); });
+    db.ref('notifications').on('value', (s) => { notifications=[]; s.forEach(c=>{notifications.push({id:c.key,...c.val()})}); notifications.reverse(); renderNotifications(); updateAdminNotificationList(); document.getElementById('notif-badge').innerText = notifications.length; if(notifications.length>0) document.getElementById('notif-badge').style.display='flex'; });
+    
+    // UPDATED SETTINGS LISTENER TO CHECK FOR UPDATES
+    db.ref('settings').on('value', (s) => { 
+        settings = s.val() || {}; 
+        renderSettings(); 
+        checkForAppUpdates(); // Check version when settings load/change
+    });
+    
+    db.ref('custom_tabs').on('value', (s) => { customTabs=[]; s.forEach(c=>{customTabs.push({id:c.key,...c.val()})}); renderSidebarTabs(); renderHomeCustomTabs(); updateAdminCustomTabsList(); populateAdminTabSelect(); });
+    db.ref('custom_products').on('value', (s) => { customProducts=[]; s.forEach(c=>{customProducts.push({id:c.key,...c.val()})}); renderHomeCustomTabs(); updateAdminCustomProductsList(); });
+    db.ref('dynamic_pages').on('value', (s) => { dynamicPages = []; s.forEach(c => { dynamicPages.push({ id: c.key, ...c.val() }) }); renderDynamicPagesLists(); });
+
+    function renderSettings() {
+        if(settings.logo) { document.getElementById('sidebar-logo-img').src = settings.logo; document.getElementById('f-logo-img').src = settings.logo; }
+        if(settings.name && document.getElementById('header-site-title').innerText !== "Admin Panel") { 
+            document.title = settings.name; 
+            document.getElementById('header-site-title').innerText = settings.name; 
+        }
+        if(settings.shareImg) document.getElementById('share-app-img').src = settings.shareImg;
+        if(settings.copyright) document.getElementById('footer-copyright-text').innerText = settings.copyright;
+        
+        // Populate settings in admin panel
+        if(document.getElementById('set-name').offsetParent !== null) { // check if admin tab is visible
+             document.getElementById('set-version').value = settings.appVersion || '';
+             document.getElementById('set-update-msg').value = settings.updateMsg || '';
+
+             document.getElementById('set-name').value = settings.name || '';
+             document.getElementById('set-logo').value = settings.logo || '';
+             document.getElementById('set-share-img').value = settings.shareImg || '';
+             document.getElementById('set-share-app-link').value = settings.shareAppLink || '';
+             document.getElementById('set-share-website-link').value = settings.shareWebsiteLink || '';
+             document.getElementById('set-copyright').value = settings.copyright || '';
+             document.getElementById('set-fb').value = settings.facebook || '';
+             document.getElementById('set-insta').value = settings.instagram || '';
+             document.getElementById('set-tw').value = settings.twitter || '';
+             document.getElementById('set-wa').value = settings.whatsapp || '';
+             document.getElementById('set-tg').value = settings.telegram || '';
+             document.getElementById('set-yt').value = settings.youtube || '';
+        }
+
+        const sidebarSocials = document.getElementById('sidebar-socials');
+        let sidebarSocialHtml = '';
+        
+        ['fb','wa','tg','in','tw','yt'].forEach(k => {
+             const key = k === 'fb' ? 'facebook' : k === 'wa' ? 'whatsapp' : k === 'tg' ? 'telegram' : k === 'in' ? 'instagram' : k === 'tw' ? 'twitter' : 'youtube';
+             const iconClass = k === 'fb' ? 'fab fa-facebook-f' : k === 'wa' ? 'fab fa-whatsapp' : k === 'tg' ? 'fab fa-telegram-plane' : k === 'in' ? 'fab fa-instagram' : k === 'tw' ? 'fab fa-twitter' : 'fab fa-youtube';
+             const el = document.getElementById('f-'+k);
+             
+             if(settings[key]) { 
+                const url = k === 'wa' ? `https://wa.me/${settings[key]}` : settings[key];
+                if(el) { el.href = url; el.style.display = 'flex'; }
+                sidebarSocialHtml += `<a href="${url}" target="_blank" class="s-btn ${k}" style="width:25px; height:25px; font-size:12px; display:inline-flex; margin: 0 3px;"><i class="${iconClass}"></i></a>`;
+             } else {
+                if(el) el.style.display = 'none';
+             }
+        });
+        sidebarSocials.innerHTML = sidebarSocialHtml;
+    }
+
+    function renderSidebarTabs() { document.getElementById('sidebar-custom-tabs').innerHTML = customTabs.map(t => `<div class="menu-item" onclick="openCustomTab('${t.id}', '${t.name}'); toggleSidebar()"><i class="${t.icon || 'fa fa-star'}"></i> ${t.name}</div>`).join(''); }
+    
+    function renderHomeCustomTabs() {
+        const div = document.getElementById('home-custom-tabs-area');
+        const visibleTabs = customTabs.filter(t => t.showHome === true);
+        const limit = window.innerWidth >= 1024 ? 16 : 8; 
+        div.innerHTML = visibleTabs.map(t => {
+            const cp = customProducts.filter(p => p.tabId === t.id).slice(0, limit);
+            return `<div class="section-title">${t.name} <span class="view-all-link" onclick="openCustomTab('${t.id}', '${t.name}')">View All</span></div><div class="grid-container">${cp.map(p => getProductCardHTML(p)).join('')}</div>`;
+        }).join('');
+    }
+
+    function renderSlider() {
+        const container = document.getElementById('homeSlider'); 
+        const dotsContainer = document.getElementById('slider-dots');
+        if(slides.length === 0) return;
+
+        let screenWidth = window.innerWidth;
+        let imgKey = 'imgMob'; 
+
+        if (screenWidth > 1024) {
+            imgKey = 'imgPc'; 
+        } else if (screenWidth >= 768) {
+            imgKey = 'imgTab'; 
+        }
+
+        container.innerHTML = slides.map((s, i) => {
+            let imgSrc = s[imgKey] || s.imgMob || s.img; 
+            return `<img src="${imgSrc}" class="slide ${i===0?'active':''}">`;
+        }).join('');
+
+        dotsContainer.innerHTML = slides.map((_, i) => `<div class="dot ${i===0?'active':''}" onclick="changeSlide(${i})"></div>`).join('');
+        
+        let current = 0;
+        if(window.sliderInterval) clearInterval(window.sliderInterval);
+        window.sliderInterval = setInterval(() => {
+            const els = document.querySelectorAll('.slide'); const dots = document.querySelectorAll('.dot');
+            if(els.length > 0) { 
+                els[current].classList.remove('active'); dots[current].classList.remove('active'); 
+                current = (current + 1) % els.length; 
+                els[current].classList.add('active'); dots[current].classList.add('active'); 
+            }
+        }, 3000);
+    }
+
+    window.changeSlide = (index) => {
+        const els = document.querySelectorAll('.slide'); const dots = document.querySelectorAll('.dot');
+        els.forEach(e => e.classList.remove('active')); dots.forEach(d => d.classList.remove('active')); els[index].classList.add('active'); dots[index].classList.add('active');
+    };
+    function renderHomeCategories() { document.getElementById('homeCategories').innerHTML = categories.map(c => `<div class="circle-item" onclick="openCategoryPage('${c.name}')"><img src="${c.img}" class="circle-img"><div class="circle-name">${c.name}</div></div>`).join(''); }
+    function renderHomeBrands() { document.getElementById('homeBrands').innerHTML = brands.map(b => `<div class="circle-item" onclick="openBrandPage('${b.name}')"><img src="${b.img}" class="circle-img"><div class="circle-name">${b.name}</div></div>`).join(''); }
+    
+    function getProductCardHTML(p) { 
+        return `<div class="product-card">
+            <div class="p-img-box"><img src="${p.img}" class="p-img"></div>
+            <div class="p-title">${p.name}</div>
+            <div class="p-meta">
+                ${p.brand ? p.brand : ''} ${p.brand && p.category ? '|' : ''} ${p.category ? p.category : ''}
+            </div>
+            <div class="p-price">${p.price}</div>
+            <a href="${p.link || '#'}" target="_blank" class="p-btn">${p.btnText || 'Buy Now'}</a>
+        </div>`; 
+    }
+    
+    function renderPublicProducts(list) { document.getElementById('products-container').innerHTML = list.length === 0 ? "<p>No products.</p>" : list.map(p => getProductCardHTML(p)).join(''); }
+    
+    function renderHomeLatestProducts() { 
+        const limit = window.innerWidth >= 1024 ? 16 : 8;
+        document.getElementById('home-latest-products').innerHTML = products.slice(-limit).reverse().map(p => getProductCardHTML(p)).join(''); 
+    }
+    
+    function renderHomeAllProducts() { 
+        const limit = window.innerWidth >= 1024 ? 16 : 8;
+        document.getElementById('home-all-products').innerHTML = products.slice(0, limit).map(p => getProductCardHTML(p)).join(''); 
+    }
+    
+    function renderList(type) {
+        const div = document.getElementById('list-container');
+        if(type === 'categories') { div.innerHTML = categories.map(c => `<div class="product-card" onclick="openCategoryPage('${c.name}')"><div class="p-img-box"><img src="${c.img}" class="p-img"></div><div class="p-title">${c.name}</div></div>`).join(''); } 
+        else { div.innerHTML = brands.map(c => `<div class="product-card" onclick="openBrandPage('${c.name}')"><div class="p-img-box"><img src="${c.img}" class="p-img"></div><div class="p-title">${c.name}</div></div>`).join(''); }
+    }
+    function renderNotifications() { document.getElementById('notification-list-container').innerHTML = notifications.map(n => `<div class="notif-card" onclick="window.location.href='${n.link || '#'}'"><img src="${n.img}" class="notif-img"><div class="notif-content"><h4>${n.title}</h4><p>${n.body}</p><div class="notif-time">${new Date(n.date).toLocaleString()}</div></div></div>`).join(''); }
+
+    function updateSidebarForAdmin() { document.getElementById('user-menu').style.display = 'none'; document.getElementById('admin-menu').style.display = 'block'; }
+    function updateSidebarForUser() { document.getElementById('user-menu').style.display = 'block'; document.getElementById('admin-menu').style.display = 'none'; }
+    
+    window.checkAdminAccess = () => {
+        if(auth.currentUser) {
+            navigateTo('admin-dashboard'); populateAdminSelects(); updateSidebarForAdmin(); loadAdminChatList();
+            db.ref('status/admin').update({ online: true, lastSeen: null });
+            document.getElementById('admin-sidebar-links').innerHTML = `
+                <div class="menu-item" onclick="switchAdminTab('tab-slider'); toggleSidebar()"><i class="fa fa-images"></i> Slider</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-custom-pages'); toggleSidebar()"><i class="fa fa-folder"></i> Custom Tabs</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-custom-products'); toggleSidebar()"><i class="fa fa-box-open"></i> Tab Products</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-products'); toggleSidebar()"><i class="fa fa-shopping-cart"></i> Products</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-categories'); toggleSidebar()"><i class="fa fa-list"></i> Categories</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-brands'); toggleSidebar()"><i class="fa fa-tags"></i> Brands</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-notifications'); toggleSidebar()"><i class="fa fa-bell"></i> Notifications</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-messages'); toggleSidebar()"><i class="fa fa-envelope"></i> Messages</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-page-builder'); toggleSidebar()"><i class="fa fa-file-alt"></i> Page Builder</div>
+                <div class="menu-item" onclick="switchAdminTab('tab-settings'); toggleSidebar()"><i class="fa fa-cog"></i> Settings</div>
+            `;
+        }
+    };
+
+    window.adminLogin = () => { const email = document.getElementById('adminEmail').value; const pass = document.getElementById('adminPass').value; auth.signInWithEmailAndPassword(email, pass).then(() => { checkAdminAccess(); }).catch(e => { alert("Login failed: " + e.message); }); };
+    
+    window.adminLogout = () => {
+        db.ref('status/admin').update({ online: false, lastSeen: firebase.database.ServerValue.TIMESTAMP }).then(() => {
+            auth.signOut().then(() => { updateSidebarForUser(); navigateTo('home'); });
+        });
+    };
+    
+    window.switchAdminTab = (tabId) => {
+        document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => { if(btn.getAttribute('onclick').includes(tabId)) btn.classList.add('active'); });
+        if (tabId === 'tab-settings') {
+            renderSettings();
+        }
+    };
+
+    window.deleteItem = (path) => { if(confirm('Are you sure you want to delete this?')) db.ref(path).remove(); };
+
+    function populateAdminSelects() {
+        document.getElementById('ap-cat').innerHTML = '<option value="">Select Category</option>' + categories.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+        document.getElementById('ap-brand').innerHTML = '<option value="">Select Brand</option>' + brands.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+    }
+    function populateAdminTabSelect() { document.getElementById('acp-tab-select').innerHTML = '<option value="">Select Tab</option>' + customTabs.map(t => `<option value="${t.id}">${t.name}</option>`).join(''); }
+
+    window.saveProduct = () => {
+        const name = document.getElementById('ap-name').value; const price = document.getElementById('ap-price').value; 
+        const img = document.getElementById('ap-img').value; const cat = document.getElementById('ap-cat').value; 
+        const brand = document.getElementById('ap-brand').value; const link = document.getElementById('ap-link').value;
+        if(name && price && link) {
+            db.ref('products').push({ name, price, img, category: cat, brand: brand, link }).then(() => {
+                db.ref('notifications').push({ title: "New Product!", body: name, img: img, link: link, date: new Date().toISOString() });
+                alert('Product Added!');
+            });
+        }
+    };
+
+    window.saveCustomTab = () => { const name = document.getElementById('act-name').value; const icon = document.getElementById('act-icon').value; const showHome = document.getElementById('act-home').checked; if(name) { db.ref('custom_tabs').push({ name, icon, showHome }); resetTabForm(); } };
+    window.editCustomTab = (id) => { const t = customTabs.find(tab => tab.id === id); if(t) { document.getElementById('act-id').value = id; document.getElementById('act-name').value = t.name; document.getElementById('act-icon').value = t.icon || ''; document.getElementById('act-home').checked = t.showHome; document.getElementById('btn-save-tab').style.display = 'none'; document.getElementById('btn-update-tab').style.display = 'inline-block'; document.getElementById('btn-cancel-tab').style.display = 'inline-block'; } };
+    window.updateCustomTab = () => { const id = document.getElementById('act-id').value; const name = document.getElementById('act-name').value; const icon = document.getElementById('act-icon').value; const showHome = document.getElementById('act-home').checked; if(id && name) { db.ref('custom_tabs/' + id).update({ name, icon, showHome }); resetTabForm(); } };
+    window.resetTabForm = () => { document.getElementById('act-id').value = ''; document.getElementById('act-name').value = ''; document.getElementById('act-icon').value = ''; document.getElementById('act-home').checked = false; document.getElementById('btn-save-tab').style.display = 'inline-block'; document.getElementById('btn-update-tab').style.display = 'none'; document.getElementById('btn-cancel-tab').style.display = 'none'; };
+    window.saveCustomProduct = () => { const tabId = document.getElementById('acp-tab-select').value; const name = document.getElementById('acp-name').value; const img = document.getElementById('acp-img').value; const btnText = document.getElementById('acp-btn-text').value; const link = document.getElementById('acp-link').value; if(tabId && name && link) { db.ref('custom_products').push({ tabId, name, img, btnText, link }).then(() => { alert('Added'); }); } };
+
+    function updateAdminProductList() { document.getElementById('admin-product-list').innerHTML = products.map(p => `<div class="admin-list-item"><span>${p.name}</span><button class="btn-sm btn-danger" onclick="deleteItem('products/${p.id}')">Del</button></div>`).join(''); }
+    function updateAdminCustomTabsList() { document.getElementById('admin-custom-tabs-list').innerHTML = customTabs.map(t => `<div class="admin-list-item"><span>${t.name}</span><div><button class="btn-sm btn-edit" onclick="editCustomTab('${t.id}')">Edit</button><button class="btn-sm btn-danger" onclick="deleteItem('custom_tabs/${t.id}')">Del</button></div></div>`).join(''); }
+    function updateAdminCustomProductsList() { document.getElementById('admin-custom-products-list').innerHTML = customProducts.map(p => `<div class="admin-list-item"><span>${p.name}</span><button class="btn-sm btn-danger" onclick="deleteItem('custom_products/${p.id}')">Del</button></div>`).join(''); }
+    function updateAdminNotificationList() { document.getElementById('admin-notification-list').innerHTML = notifications.map(n => `<div class="admin-list-item"><span>${n.title}</span><button class="btn-sm btn-danger" onclick="deleteItem('notifications/${n.id}')">Del</button></div>`).join(''); }
+    function updateAdminSliderList() { document.getElementById('admin-slider-list').innerHTML = slides.map(s => `<div class="admin-list-item"><span>Mobile View Slide</span><button class="btn-sm btn-danger" onclick="deleteItem('slider/${s.id}')">Del</button></div>`).join(''); }
+    function updateAdminCategoryList() { document.getElementById('admin-category-list').innerHTML = categories.map(c => `<div class="admin-list-item"><span>${c.name}</span><button class="btn-sm btn-danger" onclick="deleteItem('categories/${c.id}')">Del</button></div>`).join(''); }
+    function updateAdminBrandList() { document.getElementById('admin-brand-list').innerHTML = brands.map(b => `<div class="admin-list-item"><span>${b.name}</span><button class="btn-sm btn-danger" onclick="deleteItem('brands/${b.id}')">Del</button></div>`).join(''); }
+
+    window.saveSlide = () => { 
+        const mob = document.getElementById('as-img-mob').value;
+        const tab = document.getElementById('as-img-tab').value;
+        const pc = document.getElementById('as-img-pc').value;
+        if(mob) {
+            db.ref('slider').push({ imgMob: mob, imgTab: tab, imgPc: pc }).then(() => {
+                alert("Slide Added!");
+                document.getElementById('as-img-mob').value = '';
+                document.getElementById('as-img-tab').value = '';
+                document.getElementById('as-img-pc').value = '';
+            });
+        } else {
+            alert("Please provide at least the Mobile image.");
+        }
+    };
+
+    window.saveCategory = () => { db.ref('categories').push({name: document.getElementById('ac-name').value, img: document.getElementById('ac-img').value}); };
+    window.saveBrand = () => { db.ref('brands').push({name: document.getElementById('ab-name').value, img: document.getElementById('ab-img').value}); };
+
+    // UPDATED SAVE SETTINGS TO INCLUDE VERSION
+    window.saveSettings = () => {
+        const settingsData = {
+            appVersion: document.getElementById('set-version').value, // NEW
+            updateMsg: document.getElementById('set-update-msg').value, // NEW
+            
+            name: document.getElementById('set-name').value, 
+            logo: document.getElementById('set-logo').value, 
+            shareImg: document.getElementById('set-share-img').value, 
+            shareAppLink: document.getElementById('set-share-app-link').value, 
+            shareWebsiteLink: document.getElementById('set-share-website-link').value,
+            copyright: document.getElementById('set-copyright').value,
+            facebook: document.getElementById('set-fb').value, 
+            instagram: document.getElementById('set-insta').value, 
+            twitter: document.getElementById('set-tw').value, 
+            whatsapp: document.getElementById('set-wa').value, 
+            telegram: document.getElementById('set-tg').value, 
+            youtube: document.getElementById('set-yt').value 
+        };
+        
+        db.ref('settings').update(settingsData).then(() => {
+            alert('Settings & Version Saved Successfully!');
+        }).catch((error) => {
+            alert('Error saving settings: ' + error.message);
+        });
+    };
+
+
+    window.addEventListener('resize', () => { 
+        renderSlider(); 
+        renderHomeLatestProducts(); 
+        renderHomeAllProducts(); 
+        renderHomeCustomTabs(); 
+    });
+</script>
+
+</body>
+</html>
