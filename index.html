@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- ANTI-CACHE: Browser ko purana file save karne se rokna -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
     <title>India Click Store</title>
 
 <!-- Fonts & Icons -->
@@ -14,6 +19,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-messaging.js"></script>
+
 <style>
     :root {
         --primary: #4e54c8;
@@ -114,7 +120,7 @@
     /* SEARCH SECTION */
     .search-section { 
         background: var(--light); padding: 5px 10px; border-radius: 20px; margin-bottom: 15px; margin-top: 5px;
-        box-shadow: inset 3px 3px 6px #a3b1c6, inset -3px -3px 6px #ffffff; 
+        box-shadow: inset 3px 3px 6px #a3b1c6, -3px -3px 6px #ffffff; 
         display: flex; align-items: center; height: 45px; 
     }
     .search-input-container { display: flex; align-items: center; width: 100%; height: 100%; }
@@ -409,7 +415,6 @@
 </div>
 
 <!-- SIDEBAR -->
-
 <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
@@ -429,7 +434,6 @@
             <div class="menu-item" onclick="toggleSubMenu()"><i class="fa fa-info-circle"></i> More Pages <i class="fa fa-caret-down" style="margin-left:auto; font-size:12px;"></i></div>
             <div id="dynamic-pages-submenu" class="submenu"></div>
         </div>
-
         <div id="admin-menu" style="display:none;">
             <div id="admin-sidebar-links"></div>
             <div class="menu-item" style="background:#ff4757; color:white;" onclick="adminLogout(); toggleSidebar()"><i class="fa fa-sign-out-alt" style="color:white;"></i> Logout</div>
@@ -442,7 +446,6 @@
 </div>
 
 <!-- MAIN HEADER -->
-
 <header id="main-header">
     <div class="header-left"><i class="fa fa-bars menu-btn" onclick="toggleSidebar()"></i></div>
     <div class="site-title" id="header-site-title">India Click Store</div>
@@ -455,7 +458,6 @@
 </header>
 
 <!-- DYNAMIC TAB HEADER -->
-
 <div id="dynamic-header">
     <i class="fa fa-arrow-left" onclick="goBack()" style="font-size: 16px; cursor: pointer; padding-right: 15px; color:white;"></i>
     <div class="tab-header-icon" id="header-icon-container">
@@ -465,7 +467,6 @@
 </div>
 
 <!-- 1. HOME VIEW -->
-
 <div id="view-home" class="container active-page">
     <div class="search-section">
         <div class="search-input-container">
@@ -474,26 +475,19 @@
             <i class="fa fa-filter search-icon-right" onclick="navigateTo('filter')"></i>
         </div>
     </div>
-
     <div class="slider-container" id="homeSliderContainer">
         <div id="homeSlider"></div>
         <div class="slider-dots" id="slider-dots"></div>
     </div>
-
     <div class="section-title">Latest Products <span class="view-all-link" onclick="navigateTo('all-products')">View All</span></div>
     <div id="home-latest-products" class="grid-container"></div>
-
     <div class="section-title">Top Brands <span class="view-all-link" onclick="navigateTo('all-brands')">View All</span></div>
     <div class="circle-grid" id="homeBrands"></div>
-
     <div class="section-title">All Products <span class="view-all-link" onclick="navigateTo('all-products')">View All</span></div>
     <div id="home-all-products" class="grid-container"></div>
-
     <div class="section-title">Categories <span class="view-all-link" onclick="navigateTo('all-categories')">View All</span></div>
     <div class="circle-grid" id="homeCategories"></div>
-
     <div id="home-custom-tabs-area"></div>
-
     <div class="footer-new">
         <div class="f-logo-bg"><img src="https://via.placeholder.com/150x50?text=LOGO" id="f-logo-img" class="f-logo-img" alt="Store Logo"></div>
         <p class="f-desc">India Click Store: Your trusted platform for the best deals.</p>
@@ -513,19 +507,16 @@
 </div>
 
 <!-- 2. GENERIC LIST VIEW -->
-
 <div id="view-list" class="container">
     <div id="list-container" class="grid-container" style="margin-top: 15px;"></div>
 </div>
 
 <!-- 3. ALL PRODUCTS VIEW -->
-
 <div id="view-products" class="container">
     <div id="products-container" class="grid-container" style="margin-top: 15px;"></div>
 </div>
 
 <!-- CUSTOM TAB VIEW -->
-
 <div id="view-custom-tab" class="container">
     <div id="custom-tab-products" class="grid-container" style="margin-top: 15px;"></div>
 </div>
@@ -538,20 +529,16 @@
         </div>
         <p style="font-weight: 600; color: #333; margin-bottom: 5px;">Share with Friends!</p>
         <p style="font-size: 11px; color: #666; margin-bottom: 20px;">Share the app or website with your friends.</p>
-        
         <button class="p-btn" style="background: var(--success-grad); font-size: 12px; height: 40px; margin-bottom: 12px;" onclick="shareAndCopy('app')">
             <i class="fa fa-mobile-alt"></i> Share App & Copy Link
         </button>
-
         <button class="p-btn" style="background: #4facfe; font-size: 12px; height: 40px;" onclick="shareAndCopy('website')">
             <i class="fa fa-globe"></i> Share Website & Copy Link
         </button>
     </div>
 </div>
 
-
 <!-- FILTER PAGE -->
-
 <div id="view-filter" class="container">
     <div style="background: var(--light); padding: 20px; border-radius: 15px; box-shadow: var(--shadow-dark), var(--shadow-light); margin-top: 20px;">
         <h3 style="margin-bottom:15px;">Filter Products</h3>
@@ -570,13 +557,11 @@
 </div>
 
 <!-- DYNAMIC PAGE VIEWER -->
-
 <div id="view-dynamic-page" class="container">
     <div id="dynamic-page-content" class="dynamic-content"></div>
 </div>
 
 <!-- NOTIFICATIONS -->
-
 <div id="view-notifications" class="container">
     <button id="enable-notif-btn" class="enable-notif-btn" onclick="requestNotifyPermission()" style="margin-top: 20px; font-size:12px; padding:10px;">🔔 Enable Push Notifications</button>
     <div id="notification-list-container">
@@ -585,7 +570,6 @@
 </div>
 
 <!-- USER HELP / CHAT VIEW -->
-
 <div id="view-help-chat" class="container" style="display: none; height: 100vh; padding: 0;">
     <div id="help-header" class="header-chat-consistent">
         <div style="display: flex; align-items: center;">
@@ -609,7 +593,6 @@
 </div>
 
 <!-- ADMIN LOGIN -->
-
 <div id="view-admin-login" class="container" style="padding:0;">
     <div class="unified-header">
         <div class="header-left">
@@ -627,7 +610,6 @@
 </div>
 
 <!-- ADMIN DASHBOARD -->
-
 <div id="view-admin-dashboard" class="container">
     <div class="admin-tabs">
         <button class="tab-btn active" onclick="switchAdminTab('tab-slider')">Slider</button>
@@ -642,176 +624,186 @@
         <button class="tab-btn" onclick="switchAdminTab('tab-settings')">Settings</button>
     </div>
 
-    <!-- ADMIN SECTIONS -->
-    <div id="tab-slider" class="admin-section active">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <h3>Add Slider (3 Views)</h3>
-            <label style="font-size:11px;">1. Mobile View URL</label>
-            <input type="text" id="as-img-mob" class="form-input" placeholder="Mobile Image URL">
-            <label style="font-size:11px;">2. Mobile Browser Desktop Mode URL</label>
-            <input type="text" id="as-img-tab" class="form-input" placeholder="Tablet/Desktop Mode URL">
-            <label style="font-size:11px;">3. PC/Laptop View URL</label>
-            <input type="text" id="as-img-pc" class="form-input" placeholder="PC View Image URL">
-            <button onclick="saveSlide()" class="form-btn">Add Slide</button>
+<!-- ADMIN SECTIONS -->
+<div id="tab-slider" class="admin-section active">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <h3>Add Slider (3 Views)</h3>
+        <label style="font-size:11px;">1. Mobile View URL</label>
+        <input type="text" id="as-img-mob" class="form-input" placeholder="Mobile Image URL">
+        <label style="font-size:11px;">2. Mobile Browser Desktop Mode URL</label>
+        <input type="text" id="as-img-tab" class="form-input" placeholder="Tablet/Desktop Mode URL">
+        <label style="font-size:11px;">3. PC/Laptop View URL</label>
+        <input type="text" id="as-img-pc" class="form-input" placeholder="PC View Image URL">
+        <button onclick="saveSlide()" class="form-btn">Add Slide</button>
+    </div>
+    <div id="admin-slider-list"></div>
+</div>
+
+<div id="tab-custom-pages" class="admin-section">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <h3>Create Sidebar Tab/Page</h3>
+        <input type="hidden" id="act-id">
+        <input type="text" id="act-name" class="form-input" placeholder="Tab Name">
+        <input type="text" id="act-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-star)">
+        <label style="font-size:12px; display:block; margin-bottom:10px;">
+            <input type="checkbox" id="act-home"> Show on Home Page
+        </label>
+        <button onclick="saveCustomTab()" id="btn-save-tab" class="form-btn" style="width:48%; display:inline-block;">Create Tab</button>
+        <button onclick="updateCustomTab()" id="btn-update-tab" class="form-btn btn-edit" style="width:48%; display:none;">Update Tab</button>
+        <button onclick="resetTabForm()" id="btn-cancel-tab" class="form-btn" style="width:48%; background:#666; display:none; box-shadow:none;">Cancel</button>
+    </div>
+    <div id="admin-custom-tabs-list"></div>
+</div>
+
+<div id="tab-custom-products" class="admin-section">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <h3>Add Product to Custom Tab</h3>
+        <select id="acp-tab-select" class="form-input"><option value="">Select Tab</option></select>
+        <input type="text" id="acp-name" class="form-input" placeholder="Product Name">
+        <input type="text" id="acp-img" class="form-input" placeholder="Image URL">
+        <input type="text" id="acp-btn-text" class="form-input" placeholder="Button Name">
+        <input type="text" id="acp-link" class="form-input" placeholder="Link">
+        <button onclick="saveCustomProduct()" class="form-btn">Add Product</button>
+    </div>
+    <div id="admin-custom-products-list"></div>
+</div>
+
+<div id="tab-products" class="admin-section">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <h3>Add Main Product & Send Notification</h3>
+        <input type="text" id="ap-name" class="form-input" placeholder="Product Name">
+        <input type="text" id="ap-price" class="form-input" placeholder="Price" value="₹ ">
+        <input type="text" id="ap-img" class="form-input" placeholder="Image URL">
+        <select id="ap-cat" class="form-input"><option value="">Select Category</option></select>
+        <select id="ap-brand" class="form-input"><option value="">Select Brand</option></select>
+        <input type="text" id="ap-link" class="form-input" placeholder="Affiliate Link">
+        <button onclick="saveProduct()" class="form-btn">Add Product & Notify</button>
+    </div>
+    <div id="admin-product-list"></div>
+</div>
+
+<div id="tab-categories" class="admin-section">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <input type="text" id="ac-name" class="form-input" placeholder="Category Name">
+        <input type="text" id="ac-img" class="form-input" placeholder="Image URL (Icon)">
+        <button onclick="saveCategory()" class="form-btn">Add Category</button>
+    </div>
+    <div id="admin-category-list"></div>
+</div>
+
+<div id="tab-brands" class="admin-section">
+    <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        <input type="text" id="ab-name" class="form-input" placeholder="Brand Name">
+        <input type="text" id="ab-img" class="form-input" placeholder="Image URL">
+        <button onclick="saveBrand()" class="form-btn">Add Brand</button>
+    </div>
+    <div id="admin-brand-list"></div>
+</div>
+
+<div id="tab-notifications" class="admin-section">
+    <div id="admin-notification-list"></div>
+</div>
+
+<div id="tab-messages" class="admin-section">
+    <div id="admin-chat-list-view">
+        <h3>User Chats</h3>
+        <div id="admin-users-list"></div>
+    </div>
+    
+    <div id="admin-single-chat-view" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:var(--chat-bg); flex-direction:column;">
+        <div class="header-chat-consistent">
+            <i class="fa fa-arrow-left" onclick="closeAdminChat()" style="font-size:16px; cursor:pointer; margin-right:15px;"></i>
+            <div style="flex:1; display:flex; align-items:center; overflow:hidden;">
+                <div style="width:35px; height:35px; border-radius:50%; background:white; display:flex; justify-content:center; align-items:center; color:var(--primary); margin-right:10px; flex-shrink:0;">
+                    <i class="fa fa-user" style="font-size:18px;"></i>
+                </div>
+                <div style="display:flex; flex-direction:column; overflow:hidden;">
+                    <span id="chat-user-name" style="font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">User Name</span>
+                    <span style="font-size:10px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Chat ID...</span>
+                </div>
+            </div>
+            <div onclick="deleteCurrentChat()" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
+                <i class="fa fa-trash" style="font-size:16px;"></i>
+            </div>
         </div>
-        <div id="admin-slider-list"></div>
-    </div>
 
-    <div id="tab-custom-pages" class="admin-section">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <h3>Create Sidebar Tab/Page</h3>
-            <input type="hidden" id="act-id">
-            <input type="text" id="act-name" class="form-input" placeholder="Tab Name">
-            <input type="text" id="act-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-star)">
-            <label style="font-size:12px; display:block; margin-bottom:10px;">
-                <input type="checkbox" id="act-home"> Show on Home Page
-            </label>
-            <button onclick="saveCustomTab()" id="btn-save-tab" class="form-btn" style="width:48%; display:inline-block;">Create Tab</button>
-            <button onclick="updateCustomTab()" id="btn-update-tab" class="form-btn btn-edit" style="width:48%; display:none;">Update Tab</button>
-            <button onclick="resetTabForm()" id="btn-cancel-tab" class="form-btn" style="width:48%; background:#666; display:none; box-shadow:none;">Cancel</button>
+        <div class="chat-container">
+             <div id="admin-messages-area" class="chat-messages"></div>
+             <div class="chat-input-area">
+                <input type="text" id="admin-chat-input" class="chat-input" placeholder="Type a message...">
+                <button class="chat-send-btn" onclick="sendAdminReply()"><i class="fa fa-paper-plane"></i></button>
+             </div>
         </div>
-        <div id="admin-custom-tabs-list"></div>
     </div>
+</div>
 
-    <div id="tab-custom-products" class="admin-section">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <h3>Add Product to Custom Tab</h3>
-            <select id="acp-tab-select" class="form-input"><option value="">Select Tab</option></select>
-            <input type="text" id="acp-name" class="form-input" placeholder="Product Name">
-            <input type="text" id="acp-img" class="form-input" placeholder="Image URL">
-            <input type="text" id="acp-btn-text" class="form-input" placeholder="Button Name">
-            <input type="text" id="acp-link" class="form-input" placeholder="Link">
-            <button onclick="saveCustomProduct()" class="form-btn">Add Product</button>
-        </div>
-        <div id="admin-custom-products-list"></div>
-    </div>
-
-    <div id="tab-products" class="admin-section">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <h3>Add Main Product</h3>
-            <input type="text" id="ap-name" class="form-input" placeholder="Product Name">
-            <input type="text" id="ap-price" class="form-input" placeholder="Price" value="₹ ">
-            <input type="text" id="ap-img" class="form-input" placeholder="Image URL">
-            <select id="ap-cat" class="form-input"><option value="">Select Category</option></select>
-            <select id="ap-brand" class="form-input"><option value="">Select Brand</option></select>
-            <input type="text" id="ap-link" class="form-input" placeholder="Affiliate Link">
-            <button onclick="saveProduct()" class="form-btn">Add Product</button>
-        </div>
-        <div id="admin-product-list"></div>
-    </div>
-
-    <div id="tab-categories" class="admin-section">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <input type="text" id="ac-name" class="form-input" placeholder="Category Name">
-            <input type="text" id="ac-img" class="form-input" placeholder="Image URL (Icon)">
-            <button onclick="saveCategory()" class="form-btn">Add Category</button>
-        </div>
-        <div id="admin-category-list"></div>
-    </div>
-
-    <div id="tab-brands" class="admin-section">
-        <div style="background:var(--light); padding:15px; margin-bottom:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <input type="text" id="ab-name" class="form-input" placeholder="Brand Name">
-            <input type="text" id="ab-img" class="form-input" placeholder="Image URL">
-            <button onclick="saveBrand()" class="form-btn">Add Brand</button>
-        </div>
-        <div id="admin-brand-list"></div>
-    </div>
-
-    <div id="tab-notifications" class="admin-section">
-        <div id="admin-notification-list"></div>
-    </div>
-
-    <div id="tab-messages" class="admin-section">
-        <div id="admin-chat-list-view">
-            <h3>User Chats</h3>
-            <div id="admin-users-list"></div>
+<div id="tab-page-builder" class="admin-section">
+    <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light); margin-bottom: 20px;">
+        <h3>Create/Edit Page</h3>
+        <input type="text" id="dp-title" class="form-input" placeholder="Page Title (e.g. Terms, Privacy)">
+        <input type="text" id="dp-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-info, fa fa-gavel)">
+        
+        <div class="editor-toolbar">
+            <button class="editor-btn" onclick="execCmd('bold')">Bold</button>
+            <button class="editor-btn" onclick="execCmd('underline')">Underline</button>
+            <select onchange="execCmd('fontSize', this.value)" style="padding:4px;">
+                <option value="3">Size Normal</option>
+                <option value="1">Size Small</option>
+                <option value="5">Size Large</option>
+                <option value="7">Size Huge</option>
+            </select>
+            <input type="color" onchange="execCmd('foreColor', this.value)" title="Text Color">
         </div>
         
-        <div id="admin-single-chat-view" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:var(--chat-bg); flex-direction:column;">
-            <div class="header-chat-consistent">
-                <i class="fa fa-arrow-left" onclick="closeAdminChat()" style="font-size:16px; cursor:pointer; margin-right:15px;"></i>
-                <div style="flex:1; display:flex; align-items:center; overflow:hidden;">
-                    <div style="width:35px; height:35px; border-radius:50%; background:white; display:flex; justify-content:center; align-items:center; color:var(--primary); margin-right:10px; flex-shrink:0;">
-                        <i class="fa fa-user" style="font-size:18px;"></i>
-                    </div>
-                    <div style="display:flex; flex-direction:column; overflow:hidden;">
-                        <span id="chat-user-name" style="font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">User Name</span>
-                        <span style="font-size:10px; opacity:0.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Chat ID...</span>
-                    </div>
-                </div>
-                <div onclick="deleteCurrentChat()" style="width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;">
-                    <i class="fa fa-trash" style="font-size:16px;"></i>
-                </div>
-            </div>
-
-            <div class="chat-container">
-                 <div id="admin-messages-area" class="chat-messages"></div>
-                 <div class="chat-input-area">
-                    <input type="text" id="admin-chat-input" class="chat-input" placeholder="Type a message...">
-                    <button class="chat-send-btn" onclick="sendAdminReply()"><i class="fa fa-paper-plane"></i></button>
-                 </div>
-            </div>
-        </div>
+        <div id="editor-content" contenteditable="true">Type your page content here...</div>
+        <button onclick="saveDynamicPage()" class="form-btn">Save Page</button>
     </div>
+    <div id="admin-dynamic-pages-list"></div>
+</div>
 
-    <div id="tab-page-builder" class="admin-section">
-        <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light); margin-bottom: 20px;">
-            <h3>Create/Edit Page</h3>
-            <input type="text" id="dp-title" class="form-input" placeholder="Page Title (e.g. Terms, Privacy)">
-            <input type="text" id="dp-icon" class="form-input" placeholder="Icon Class (e.g. fa fa-info, fa fa-gavel)">
-            
-            <div class="editor-toolbar">
-                <button class="editor-btn" onclick="execCmd('bold')">Bold</button>
-                <button class="editor-btn" onclick="execCmd('underline')">Underline</button>
-                <select onchange="execCmd('fontSize', this.value)" style="padding:4px;">
-                    <option value="3">Size Normal</option>
-                    <option value="1">Size Small</option>
-                    <option value="5">Size Large</option>
-                    <option value="7">Size Huge</option>
-                </select>
-                <input type="color" onchange="execCmd('foreColor', this.value)" title="Text Color">
-            </div>
-            
-            <div id="editor-content" contenteditable="true">Type your page content here...</div>
-            <button onclick="saveDynamicPage()" class="form-btn">Save Page</button>
+<!-- SETTINGS TAB (RED BOX ADDED) -->
+<div id="tab-settings" class="admin-section">
+    <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
+        
+        <!-- RED BOX FOR IMP OPTION (Force Visibility) -->
+        <div style="border: 2px solid red; background: #fff0f0; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="color:red; border-bottom:1px solid red; padding-bottom:5px; margin-bottom:10px; margin-top:0;">Notification Settings (IMP)</h3>
+            <label style="font-size:12px; font-weight:bold; color:red;">FCM Server Key (Legacy)</label>
+            <input type="text" id="set-fcm-key" class="form-input" placeholder="Paste Key Here..." style="border:1px solid red;">
+            <p style="font-size:10px; color:red; margin-top:5px;">* Yeh key dalna zaruri hai tabhi user ko notification milega.</p>
         </div>
-        <div id="admin-dynamic-pages-list"></div>
-    </div>
 
-    <div id="tab-settings" class="admin-section">
-        <div style="background:var(--light); padding:15px; border-radius:12px; box-shadow: var(--shadow-dark), var(--shadow-light);">
-            <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px;">App Version Control</h3>
-            <label style="font-size:11px; font-weight:bold;">Current App Version (Decimal, e.g. 1.0)</label>
-            <input type="number" step="0.1" id="set-version" class="form-input" placeholder="e.g. 1.0">
-            <label style="font-size:11px; font-weight:bold;">Update Message</label>
-            <input type="text" id="set-update-msg" class="form-input" placeholder="New features added...">
-            
-            <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px; margin-top:20px;">General Settings</h3>
-            <h3>Website Name</h3>
-            <input type="text" id="set-name" class="form-input" placeholder="Website Name">
-            <h3>Website Logo</h3>
-            <input type="text" id="set-logo" class="form-input" placeholder="Logo Image URL">
-            <h3>Share App Image</h3>
-            <input type="text" id="set-share-img" class="form-input" placeholder="Share App Image/QR URL">
-            
-            <h3>Share App Link</h3>
-            <input type="text" id="set-share-app-link" class="form-input" placeholder="URL for sharing the app">
-            <h3>Share Website Link</h3>
-            <input type="text" id="set-share-website-link" class="form-input" placeholder="URL for sharing the website">
+        <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px; margin-top:20px;">App Version Control</h3>
+        <label style="font-size:11px; font-weight:bold;">Current App Version (Decimal, e.g. 1.0)</label>
+        <input type="number" step="0.1" id="set-version" class="form-input" placeholder="e.g. 1.0">
+        <label style="font-size:11px; font-weight:bold;">Update Message</label>
+        <input type="text" id="set-update-msg" class="form-input" placeholder="New features added...">
+        
+        <h3 style="color:var(--primary); border-bottom:1px solid #ccc; padding-bottom:5px; margin-bottom:15px; margin-top:20px;">General Settings</h3>
+        <h3>Website Name</h3>
+        <input type="text" id="set-name" class="form-input" placeholder="Website Name">
+        <h3>Website Logo</h3>
+        <input type="text" id="set-logo" class="form-input" placeholder="Logo Image URL">
+        <h3>Share App Image</h3>
+        <input type="text" id="set-share-img" class="form-input" placeholder="Share App Image/QR URL">
+        
+        <h3>Share App Link</h3>
+        <input type="text" id="set-share-app-link" class="form-input" placeholder="URL for sharing the app">
+        <h3>Share Website Link</h3>
+        <input type="text" id="set-share-website-link" class="form-input" placeholder="URL for sharing the website">
 
-            <h3>Footer Copyright Text</h3>
-            <input type="text" id="set-copyright" class="form-input" placeholder="© 2025 ...">
-            <h3>Social Media</h3>
-            <input type="text" id="set-fb" class="form-input" placeholder="Facebook URL">
-            <input type="text" id="set-insta" class="form-input" placeholder="Instagram URL">
-            <input type="text" id="set-tw" class="form-input" placeholder="Twitter URL">
-            <input type="text" id="set-wa" class="form-input" placeholder="WhatsApp Number">
-            <input type="text" id="set-tg" class="form-input" placeholder="Telegram URL">
-            <input type="text" id="set-yt" class="form-input" placeholder="YouTube URL"> 
-            <button onclick="saveSettings()" class="form-btn">Save Settings</button>
-        </div>
+        <h3>Footer Copyright Text</h3>
+        <input type="text" id="set-copyright" class="form-input" placeholder="© 2025 ...">
+        <h3>Social Media</h3>
+        <input type="text" id="set-fb" class="form-input" placeholder="Facebook URL">
+        <input type="text" id="set-insta" class="form-input" placeholder="Instagram URL">
+        <input type="text" id="set-tw" class="form-input" placeholder="Twitter URL">
+        <input type="text" id="set-wa" class="form-input" placeholder="WhatsApp Number">
+        <input type="text" id="set-tg" class="form-input" placeholder="Telegram URL">
+        <input type="text" id="set-yt" class="form-input" placeholder="YouTube URL"> 
+        <button onclick="saveSettings()" class="form-btn">Save Settings</button>
     </div>
+</div>
 </div>
 
 <script>
@@ -831,12 +823,65 @@
     const auth = firebase.auth();
     const db = firebase.database();
     let messaging;
-    try { messaging = firebase.messaging(); } catch (e) { console.log(e); }
+    try { 
+        messaging = firebase.messaging(); 
+        
+        // Handle foreground messages
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            alert(`New Notification:\n${payload.notification.title}\n${payload.notification.body}`);
+            // Also refresh notifications list
+            navigateTo('notifications');
+        });
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./firebase-messaging-sw.js')
-        .then((registration) => { if(messaging) messaging.useServiceWorker(registration); }).catch(err => console.log(err));
+    } catch (e) { 
+        console.log("Messaging not supported on this device/browser.", e); 
     }
+
+    // Register Service Worker with cache busting
+    if ('serviceWorker' in navigator) {
+        // Appending date to force fresh load of service worker
+        navigator.serviceWorker.register('./firebase-messaging-sw.js?v=' + new Date().getTime())
+        .then((registration) => {
+            console.log('Service Worker Registered');
+            if(messaging) messaging.useServiceWorker(registration);
+        }).catch(err => console.log('SW registration failed', err));
+    }
+
+    // Request Permission & SAVE TOKEN
+    window.requestNotifyPermission = () => {
+        if (!("Notification" in window)) {
+            alert("This browser does not support notifications.");
+            return;
+        }
+
+        Notification.requestPermission().then((permission) => {
+            if (permission === 'granted') {
+                if(messaging) {
+                    messaging.getToken().then((currentToken) => {
+                        if (currentToken) {
+                            console.log('FCM Token:', currentToken);
+                            // Clean token to use as key
+                            const key = currentToken.replace(/\.|#|\$|\[|\]/g, '_');
+                            // Save Token to Database
+                            db.ref('fcm_tokens/' + key).set({
+                                token: currentToken,
+                                lastUpdated: firebase.database.ServerValue.TIMESTAMP
+                            }).then(() => {
+                                alert("Notifications Enabled & Token Saved!");
+                            });
+                        } else {
+                            console.log('No Instance ID token available.');
+                        }
+                    }).catch((err) => {
+                        console.log('An error occurred while retrieving token. ', err);
+                    });
+                }
+            } else {
+                alert("Permission Denied!");
+            }
+        });
+    };
 
     let categories = [], brands = [], products = [], slides = [], notifications = [], settings = {}, customTabs = [], customProducts = [], dynamicPages = [];
     
@@ -846,10 +891,9 @@
         localStorage.setItem('chatUserId', chatUserId);
     }
     
-    // --- APP UPDATE LOGIC START ---
     let localAppVersion = localStorage.getItem('local_app_version');
     if(!localAppVersion) {
-        localAppVersion = "1.0"; // Default starting version
+        localAppVersion = "1.0"; 
         localStorage.setItem('local_app_version', localAppVersion);
     }
 
@@ -859,7 +903,6 @@
             const localVer = parseFloat(localAppVersion);
 
             if(serverVer > localVer) {
-                // Show Update Modal
                 const modal = document.getElementById('app-update-modal');
                 const msg = document.getElementById('update-modal-msg');
                 if(settings.updateMsg) msg.innerText = settings.updateMsg;
@@ -869,12 +912,13 @@
     }
 
     window.performAppUpdate = () => {
-        // Save new version
-        localStorage.setItem('local_app_version', settings.appVersion);
-        // Reload page to fetch new code/content
-        window.location.reload(true);
+        if(settings.appVersion) {
+            localStorage.setItem('local_app_version', settings.appVersion);
+        }
+        var currentUrl = window.location.href.split('?')[0]; 
+        var cacheBuster = '?t=' + new Date().getTime();
+        window.location.href = currentUrl + cacheBuster;
     };
-    // --- APP UPDATE LOGIC END ---
 
     window.shareAndCopy = (type) => {
         let linkToShare;
@@ -883,7 +927,7 @@
         if (type === 'app') {
             linkToShare = settings.shareAppLink || window.location.href;
             shareTitle = `Check out the ${settings.name || 'India Click Store'} App!`;
-        } else { // 'website'
+        } else {
             linkToShare = settings.shareWebsiteLink || window.location.href;
             shareTitle = `Visit the ${settings.name || 'India Click Store'} Website!`;
         }
@@ -934,9 +978,6 @@
         }
         document.body.removeChild(textArea);
     }
-
-
-    window.requestNotifyPermission = () => { if ("Notification" in window) Notification.requestPermission().then(p => { if (p === "granted") alert("Notifications Enabled!"); }); };
 
     window.toggleSidebar = () => {
         document.getElementById('sidebar').classList.toggle('active');
@@ -1085,20 +1126,33 @@
     window.applyFilters = () => {
         const cat = document.getElementById('filter-category').value;
         const brand = document.getElementById('filter-brand').value;
-        const min = parseInt(document.getElementById('filter-min').value) || 0;
-        const max = parseInt(document.getElementById('filter-max').value) || 99999999;
+        const min = parseFloat(document.getElementById('filter-min').value) || 0;
+        const max = parseFloat(document.getElementById('filter-max').value) || 99999999;
+        
         const filtered = products.filter(p => {
-            let pPrice = parseInt(p.price.toString().replace(/[^0-9]/g, '')) || 0;
-            return (cat === "" || p.category === cat) && (brand === "" || p.brand === brand) && (pPrice >= min && pPrice <= max);
+            let pPriceString = p.price ? p.price.toString().replace(/[^0-9.]/g, '') : "0";
+            let pPrice = parseFloat(pPriceString) || 0;
+            const pCat = p.category ? p.category.trim() : "";
+            const pBrand = p.brand ? p.brand.trim() : "";
+            const catMatch = (cat === "" || pCat === cat);
+            const brandMatch = (brand === "" || pBrand === brand);
+            const priceMatch = (pPrice >= min && pPrice <= max);
+
+            return catMatch && brandMatch && priceMatch;
         });
+
         renderPublicProducts(filtered);
-        navigateTo('view-products'); 
-        document.getElementById('dynamic-header-title').innerText = "Filtered Results";
+        document.querySelectorAll('.container').forEach(el => el.classList.remove('active-page'));
+        document.getElementById('view-products').classList.add('active-page');
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('dynamic-header').style.display = 'flex';
+        document.getElementById('dynamic-header-title').innerText = "Filtered Results (" + filtered.length + ")";
+        document.getElementById('dynamic-header-icon').className = "fa fa-filter";
+        document.getElementById('header-icon-container').style.display = 'flex';
     };
 
     window.clearFilters = () => { document.getElementById('filter-category').value = ""; document.getElementById('filter-brand').value = ""; navigateTo('all-products'); };
 
-    /* HELP CHAT LOGIC UPDATED FOR TICKS */
     let adminOnlineStatus = false;
 
     function loadUserChat() {
@@ -1231,11 +1285,11 @@
     db.ref('slider').on('value', (s) => { slides=[]; s.forEach(c=>{slides.push({id:c.key,...c.val()})}); renderSlider(); updateAdminSliderList(); });
     db.ref('notifications').on('value', (s) => { notifications=[]; s.forEach(c=>{notifications.push({id:c.key,...c.val()})}); notifications.reverse(); renderNotifications(); updateAdminNotificationList(); document.getElementById('notif-badge').innerText = notifications.length; if(notifications.length>0) document.getElementById('notif-badge').style.display='flex'; });
     
-    // UPDATED SETTINGS LISTENER TO CHECK FOR UPDATES
+    // UPDATED SETTINGS LISTENER
     db.ref('settings').on('value', (s) => { 
         settings = s.val() || {}; 
         renderSettings(); 
-        checkForAppUpdates(); // Check version when settings load/change
+        checkForAppUpdates(); 
     });
     
     db.ref('custom_tabs').on('value', (s) => { customTabs=[]; s.forEach(c=>{customTabs.push({id:c.key,...c.val()})}); renderSidebarTabs(); renderHomeCustomTabs(); updateAdminCustomTabsList(); populateAdminTabSelect(); });
@@ -1243,18 +1297,17 @@
     db.ref('dynamic_pages').on('value', (s) => { dynamicPages = []; s.forEach(c => { dynamicPages.push({ id: c.key, ...c.val() }) }); renderDynamicPagesLists(); });
 
     function renderSettings() {
-        if(settings.logo) { document.getElementById('sidebar-logo-img').src = settings.logo; document.getElementById('f-logo-img').src = settings.logo; }
-        if(settings.name && document.getElementById('header-site-title').innerText !== "Admin Panel") { 
-            document.title = settings.name; 
-            document.getElementById('header-site-title').innerText = settings.name; 
-        }
-        if(settings.shareImg) document.getElementById('share-app-img').src = settings.shareImg;
-        if(settings.copyright) document.getElementById('footer-copyright-text').innerText = settings.copyright;
+        // --- SAFE ADMIN RENDERING LOGIC ---
+        // Pehle purane version me crash ho raha tha, ab fixed hai.
+        const setNameInput = document.getElementById('set-name');
         
-        // Populate settings in admin panel
-        if(document.getElementById('set-name').offsetParent !== null) { // check if admin tab is visible
+        if(setNameInput && setNameInput.offsetParent !== null) { 
+             
              document.getElementById('set-version').value = settings.appVersion || '';
              document.getElementById('set-update-msg').value = settings.updateMsg || '';
+             
+             const keyInput = document.getElementById('set-fcm-key');
+             if(keyInput) keyInput.value = settings.fcmKey || '';
 
              document.getElementById('set-name').value = settings.name || '';
              document.getElementById('set-logo').value = settings.logo || '';
@@ -1427,11 +1480,56 @@
         const brand = document.getElementById('ap-brand').value; const link = document.getElementById('ap-link').value;
         if(name && price && link) {
             db.ref('products').push({ name, price, img, category: cat, brand: brand, link }).then(() => {
-                db.ref('notifications').push({ title: "New Product!", body: name, img: img, link: link, date: new Date().toISOString() });
-                alert('Product Added!');
+                db.ref('notifications').push({ title: "New Product: " + name, body: price, img: img, link: link, date: new Date().toISOString() });
+                
+                // Trigger PUSH using dynamic key
+                triggerFirebaseNotification("New Product Added!", `${name} - ${price}`, img, link);
+                
+                alert('Product Added & Notification Process Started!');
             });
         }
     };
+
+    // ------------------------------------------------------------------
+    // DYNAMIC TRIGGER: Reads FCM Key from settings object before sending
+    // ------------------------------------------------------------------
+    function triggerFirebaseNotification(title, body, icon, click_action) {
+        // Get Key from Loaded Settings
+        const serverKey = settings.fcmKey;
+
+        if (!serverKey) {
+            alert('Warning: Product added, but Push Notification NOT sent. Please configure "FCM Legacy Key" in Admin > Settings.');
+            return;
+        }
+
+        db.ref('fcm_tokens').once('value').then(snapshot => {
+            const tokensObj = snapshot.val();
+            if(!tokensObj) return;
+
+            const tokens = Object.values(tokensObj).map(t => t.token);
+
+            tokens.forEach(to => {
+                fetch('https://fcm.googleapis.com/fcm/send', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'key=' + serverKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        notification: {
+                            title: title,
+                            body: body,
+                            icon: icon || 'https://via.placeholder.com/150', 
+                            click_action: click_action || window.location.href
+                        },
+                        to: to
+                    })
+                }).then(response => {
+                   // Sent successfully
+                }).catch(err => console.error("Error sending", err));
+            });
+        });
+    }
 
     window.saveCustomTab = () => { const name = document.getElementById('act-name').value; const icon = document.getElementById('act-icon').value; const showHome = document.getElementById('act-home').checked; if(name) { db.ref('custom_tabs').push({ name, icon, showHome }); resetTabForm(); } };
     window.editCustomTab = (id) => { const t = customTabs.find(tab => tab.id === id); if(t) { document.getElementById('act-id').value = id; document.getElementById('act-name').value = t.name; document.getElementById('act-icon').value = t.icon || ''; document.getElementById('act-home').checked = t.showHome; document.getElementById('btn-save-tab').style.display = 'none'; document.getElementById('btn-update-tab').style.display = 'inline-block'; document.getElementById('btn-cancel-tab').style.display = 'inline-block'; } };
@@ -1466,12 +1564,15 @@
     window.saveCategory = () => { db.ref('categories').push({name: document.getElementById('ac-name').value, img: document.getElementById('ac-img').value}); };
     window.saveBrand = () => { db.ref('brands').push({name: document.getElementById('ab-name').value, img: document.getElementById('ab-img').value}); };
 
-    // UPDATED SAVE SETTINGS TO INCLUDE VERSION
     window.saveSettings = () => {
+        // Safe check for Key element existence before saving
+        const fcmInput = document.getElementById('set-fcm-key');
+        
         const settingsData = {
-            appVersion: document.getElementById('set-version').value, // NEW
-            updateMsg: document.getElementById('set-update-msg').value, // NEW
+            fcmKey: fcmInput ? fcmInput.value : (settings.fcmKey || ''), // PRESERVE OLD KEY IF INPUT HIDDEN
             
+            appVersion: document.getElementById('set-version').value,
+            updateMsg: document.getElementById('set-update-msg').value,
             name: document.getElementById('set-name').value, 
             logo: document.getElementById('set-logo').value, 
             shareImg: document.getElementById('set-share-img').value, 
@@ -1487,12 +1588,11 @@
         };
         
         db.ref('settings').update(settingsData).then(() => {
-            alert('Settings & Version Saved Successfully!');
+            alert('Settings Saved Successfully!');
         }).catch((error) => {
             alert('Error saving settings: ' + error.message);
         });
     };
-
 
     window.addEventListener('resize', () => { 
         renderSlider(); 
